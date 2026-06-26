@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!-- v1.0.0 — Full schema -->
+    <include file="db/changelog/v1.0.0/01_initial_schema.xml"              relativeToChangelogFile="false"/>
+    <include file="db/changelog/v1.0.0/02_tournament_scheduler.xml"        relativeToChangelogFile="false"/>
+    <include file="db/changelog/v1.0.0/03_audit_log.xml"                   relativeToChangelogFile="false"/>
+    <include file="db/changelog/v1.0.0/04_user_sessions.xml"               relativeToChangelogFile="false"/>
+    <include file="db/changelog/v1.0.0/05_sports_event_auction_enabled.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/v1.0.0/06_auction_optimistic_locking.xml"  relativeToChangelogFile="false"/>
+
+</databaseChangeLog>

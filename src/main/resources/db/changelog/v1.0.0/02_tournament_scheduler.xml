@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!-- ════════════════════════════════════════════════════
+         02 — Tournament Scheduler tables
+         Adds tournament_config, tournament_group,
+         group_team_standing, tournament_match with full
+         FK wiring and performance indexes.
+         ════════════════════════════════════════════════════ -->
+
+    <!-- venue_id FK on tournament_config (replaces venue_name text) -->
+    <changeSet author="community-dev" id="v1.0.0-02-01">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="tournament_config"/></not>
+        </preConditions>
+        <createTable tableName="tournament_config">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="tournament_config_pkey"/>
+            </column>
+            <column name="tournament_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sport_id"       type="BIGINT"/>
+            <column name="community_id"   type="BIGINT"/>
+            <column name="event_id"       type="BIGINT"/>
+            <column name="venue_id"       type="BIGINT"/>
+            <column name="tournament_type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="total_teams"    type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="number_of_groups"           type="INTEGER"/>
+            <column name="teams_per_group"            type="INTEGER"/>
+            <column name="teams_advancing_per_group"  type="INTEGER"/>
+            <column name="third_place_match"          type="BOOLEAN"/>
+            <column name="has_seeding"                type="BOOLEAN"/>
+            <column name="swiss_rounds"               type="INTEGER"/>
+            <column name="start_date"     type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_date"       type="DATE"/>
+            <column name="match_duration_minutes"         type="INTEGER"/>
+            <column name="break_between_matches_minutes"  type="INTEGER"/>
+            <column name="points_for_win"   type="INTEGER"/>
+            <column name="points_for_draw"  type="INTEGER"/>
+            <column name="points_for_loss"  type="INTEGER"/>
+            <column name="status"         type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by"     type="BIGINT"/>
+            <column name="created_at"     type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="updated_at"     type="TIMESTAMP WITHOUT TIME ZONE"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="community-dev" id="v1.0.0-02-02">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="tournament_group"/></not>
+        </preConditions>
+        <createTable tableName="tournament_group">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="tournament_group_pkey"/>
+            </column>
+            <column name="config_id"    type="BIGINT"/>
+            <column name="group_name"   type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="group_order"  type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="community-dev" id="v1.0.0-02-03">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="group_team_standing"/></not>
+        </preConditions>
+        <createTable tableName="group_team_standing">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="group_team_standing_pkey"/>
+            </column>
+            <column name="group_id"       type="BIGINT"/>
+            <column name="team_id"        type="BIGINT"/>
+            <column name="seed_rank"      type="INTEGER"/>
+            <column name="played"         type="INTEGER"/>
+            <column name="won"            type="INTEGER"/>
+            <column name="lost"           type="INTEGER"/>
+            <column name="drawn"          type="INTEGER"/>
+            <column name="points"         type="INTEGER"/>
+            <column name="runs_for"       type="INTEGER"/>
+            <column name="runs_against"   type="INTEGER"/>
+            <column name="overs_for"      type="INTEGER"/>
+            <column name="overs_against"  type="INTEGER"/>
+            <column name="net_run_rate"   type="FLOAT8"/>
+            <column name="qualified"      type="BOOLEAN"/>
+            <column name="eliminated"     type="BOOLEAN"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="community-dev" id="v1.0.0-02-04">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="tournament_match"/></not>
+        </preConditions>
+        <createTable tableName="tournament_match">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="tournament_match_pkey"/>
+            </column>
+            <column name="config_id"     type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="group_id"      type="BIGINT"/>
+            <column name="round"         type="VARCHAR(255)"/>
+            <column name="round_number"  type="INTEGER"/>
+            <column name="match_number"  type="INTEGER"/>
+            <column name="bracket_slot"  type="INTEGER"/>
+            <column name="team_a_id"     type="BIGINT"/>
+            <column name="team_b_id"     type="BIGINT"/>
+            <column name="winner_feed_from_matcha"      type="BIGINT"/>
+            <column name="winner_feed_from_matchb"      type="BIGINT"/>
+            <column name="winner_advances_to_match_id"  type="BIGINT"/>
+            <column name="loser_sent_to_match_id"       type="BIGINT"/>
+            <column name="scheduled_at"   type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="duration_minutes" type="INTEGER"/>
+            <column name="venue_id"       type="BIGINT"/>
+            <column name="court_id"       type="BIGINT"/>
+            <column name="status"         type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="score_teama"    type="VARCHAR(255)"/>
+            <column name="score_teamb"    type="VARCHAR(255)"/>
+            <column name="winner_team_id" type="BIGINT"/>
+            <column name="started_at"     type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="completed_at"   type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="match_notes"    type="VARCHAR(255)"/>
+            <column name="swiss_round_number" type="INTEGER"/>
+            <column name="reminder_sent"  type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reminder_sent_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="created_at"     type="TIMESTAMP WITHOUT TIME ZONE"/>
+        </createTable>
+    </changeSet>
+
+    <!-- Foreign keys for tournament_config -->
+    <changeSet author="community-dev" id="v1.0.0-02-05">
+        <addForeignKeyConstraint baseColumnNames="sport_id"     baseTableName="tournament_config" constraintName="fk_tc_sport"     referencedColumnNames="id" referencedTableName="sports_meta"   onDelete="NO ACTION" onUpdate="NO ACTION"/>
+        <addForeignKeyConstraint baseColumnNames="community_id" baseTableName="tournament_config" constraintName="fk_tc_community" referencedColumnNames="id" referencedTableName="community"     onDelete="NO ACTION" onUpdate="NO ACTION"/>
+        <addForeignKeyConstraint baseColumnNames="event_id"     baseTableName="tournament_config" constraintName="fk_tc_event"     referencedColumnNames="id" referencedTableName="sports_event"  onDelete="NO ACTION" onUpdate="NO ACTION"/>
+        <addForeignKeyConstraint baseColumnNames="venue_id"     baseTableName="tournament_config" constraintName="fk_tc_venue"     referencedColumnNames="id" referencedTableName="venue"         onDelete="NO ACTION" onUpdate="NO ACTION"/>
+        <addForeignKeyConstraint baseColumnNames="created_by"   baseTableName="tournament_config" constraintName="fk_tc_creator"   referencedColumnNames="id" referencedTableName="app_user"      onDelete="NO ACTION" onUpdate="NO ACTION"/>
+    </changeSet>
+
+    <!-- Foreign keys for tournament_group -->
+    <changeSet author="community-dev" id="v1.0.0-02-06">
+        <addForeignKeyConstraint baseColumnNames="config_id" baseTableName="tournament_group" constraintName="fk_tg_config" referencedColumnNames="id" referencedTableName="tournament_config" onDelete="NO ACTION" onUpdate="NO ACTION"/>
+    </changeSet>
+
+    <!-- Foreign keys for group_team_standing -->
+    <changeSet author="community-dev" id="v1.0.0-02-07">
+        <addForeignKeyConstraint baseColumnNames="group_id" baseTableName="group_team_standing" constraintName="fk_gts_group" referencedColumnNames="id" referencedTableName="tournament_group" onDelete="NO ACTION" onUpdate="NO ACTION"/>
+        <addForeignKeyConstraint baseColumnNames="team_id"  baseTableName="group_team_standing" constraintName="fk_gts_team"  referencedColumnNames="id" referencedTableName="auction_team"     onDelete="NO ACTION" onUpdate="NO ACTION"/>
+    </changeSet>
+
+    <!-- Foreign keys for tournament_match -->
+    <changeSet author="community-dev" id="v1.0.0-02-08">
+        <addForeignKeyConstraint baseColumnNames="config_id"      baseTableName="tournament_match" constraintName="fk_tm_config"  referencedColumnNames="id" referencedTableName="tournament_config" onDelete="CASCADE" onUpdate="NO ACTION"/>
+        <addForeignKeyConstraint baseColumnNames="group_id"       baseTableName="tournament_match" constraintName="fk_tm_group"   referencedColumnNames="id" referencedTableName="tournament_group"  onDelete="NO ACTION" onUpdate="NO ACTION"/>
+        <addForeignKeyConstraint baseColumnNames="team_a_id"      baseTableName="tournament_match" constraintName="fk_tm_teamA"   referencedColumnNames="id" referencedTableName="auction_team"      onDelete="NO ACTION" onUpdate="NO ACTION"/>
+        <addForeignKeyConstraint baseColumnNames="team_b_id"      baseTableName="tournament_match" constraintName="fk_tm_teamB"   referencedColumnNames="id" referencedTableName="auction_team"      onDelete="NO ACTION" onUpdate="NO ACTION"/>
+        <addForeignKeyConstraint baseColumnNames="winner_team_id" baseTableName="tournament_match" constraintName="fk_tm_winner"  referencedColumnNames="id" referencedTableName="auction_team"      onDelete="NO ACTION" onUpdate="NO ACTION"/>
+        <addForeignKeyConstraint baseColumnNames="venue_id"       baseTableName="tournament_match" constraintName="fk_tm_venue"   referencedColumnNames="id" referencedTableName="venue"             onDelete="NO ACTION" onUpdate="NO ACTION"/>
+        <addForeignKeyConstraint baseColumnNames="court_id"       baseTableName="tournament_match" constraintName="fk_tm_court"   referencedColumnNames="id" referencedTableName="court"             onDelete="NO ACTION" onUpdate="NO ACTION"/>
+    </changeSet>
+
+    <!-- Indexes for tournament_match -->
+    <changeSet author="community-dev" id="v1.0.0-02-09">
+        <createIndex indexName="idx_tm_config_status" tableName="tournament_match">
+            <column name="config_id"/>
+            <column name="status"/>
+        </createIndex>
+        <createIndex indexName="idx_tm_scheduled_at" tableName="tournament_match">
+            <column name="scheduled_at"/>
+        </createIndex>
+        <createIndex indexName="idx_tm_round" tableName="tournament_match">
+            <column name="config_id"/>
+            <column name="round_number"/>
+        </createIndex>
+        <createIndex indexName="idx_tm_group" tableName="tournament_match">
+            <column name="group_id"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Index for group_team_standing -->
+    <changeSet author="community-dev" id="v1.0.0-02-10">
+        <createIndex indexName="idx_standing_group" tableName="group_team_standing">
+            <column name="group_id"/>
+            <column name="points" descending="true"/>
+            <column name="net_run_rate" descending="true"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- schedule_generation_log already in 01_initial_schema -->
+
+</databaseChangeLog>

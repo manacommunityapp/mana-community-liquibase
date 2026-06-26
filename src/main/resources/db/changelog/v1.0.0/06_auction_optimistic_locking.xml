@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!-- ════════════════════════════════════════════════════
+         06 — Add @Version columns for optimistic locking
+              on auction_config, auction_player, auction_team
+         ════════════════════════════════════════════════════ -->
+
+    <changeSet author="community-dev" id="v1.0.0-06-01">
+        <preConditions onFail="MARK_RAN">
+            <not><columnExists tableName="auction_config" columnName="version"/></not>
+        </preConditions>
+        <addColumn tableName="auction_config">
+            <column name="version" type="BIGINT" defaultValueNumeric="0"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="community-dev" id="v1.0.0-06-02">
+        <preConditions onFail="MARK_RAN">
+            <not><columnExists tableName="auction_player" columnName="version"/></not>
+        </preConditions>
+        <addColumn tableName="auction_player">
+            <column name="version" type="BIGINT" defaultValueNumeric="0"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="community-dev" id="v1.0.0-06-03">
+        <preConditions onFail="MARK_RAN">
+            <not><columnExists tableName="auction_team" columnName="version"/></not>
+        </preConditions>
+        <addColumn tableName="auction_team">
+            <column name="version" type="BIGINT" defaultValueNumeric="0"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

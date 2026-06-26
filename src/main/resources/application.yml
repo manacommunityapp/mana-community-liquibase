@@ -1,0 +1,80 @@
+# ─────────────────────────────────────────────────────
+#  Mana Community — Liquibase Migration Runner
+#  Spring Boot 3.x  |  Liquibase auto-run on startup
+# ─────────────────────────────────────────────────────
+
+spring:
+  application:
+    name: mana-community-liquibase
+
+  # ── DataSource (PostgreSQL) ──────────────────────────
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:postgres}?currentSchema=${DB_SCHEMA:manacommunity}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASS:changeme}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+      connection-timeout: 30000
+      idle-timeout: 600000
+
+  # ── JPA ─────────────────────────────────────────────
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+
+  # ── Liquibase ────────────────────────────────────────
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    default-schema: ${DB_SCHEMA:manacommunity}
+    contexts: ${LIQUIBASE_CONTEXTS:default}
+    drop-first: false
+
+# ── Server ──────────────────────────────────────────────
+server:
+  port: ${PORT:8080}
+  servlet:
+    context-path: /
+
+---
+# ─────────────────────────────────────────────────────
+# PROFILE: local  (developer machine)
+# ─────────────────────────────────────────────────────
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=manacommunity
+    username: postgres
+    password: changeme
+  liquibase:
+    default-schema: manacommunity
+    contexts: default,local
+
+---
+# ─────────────────────────────────────────────────────
+# PROFILE: prod  (AWS EC2 + RDS)
+# ─────────────────────────────────────────────────────
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:postgresql://${RDS_ENDPOINT}:5432/${DB_NAME}?currentSchema=${DB_SCHEMA}
+    username: ${DB_USER}
+    password: ${DB_PASS}
+  jpa:
+    show-sql: false
+  liquibase:
+    default-schema: ${DB_SCHEMA}
+    contexts: default
