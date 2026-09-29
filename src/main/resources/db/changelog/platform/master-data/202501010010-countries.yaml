@@ -1,0 +1,161 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202501010010-countries"
+      author: "mana-community-dev"
+      labels: "platform,schema,v1.0"
+      context: "default"
+      comment: "Create countries table and seed data"
+      logicalFilePath: "db/changelog/platform/master-data/202501010010-countries.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: platform_master
+                tableName: countries
+      changes:
+        - createTable:
+            schemaName: platform_master
+            tableName: countries
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: code
+                  type: CHAR(2)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: code3
+                  type: CHAR(3)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: dialing_code
+                  type: VARCHAR(10)
+              - column:
+                  name: currency_code
+                  type: CHAR(3)
+              - column:
+                  name: currency_name
+                  type: VARCHAR(100)
+              - column:
+                  name: currency_symbol
+                  type: VARCHAR(10)
+              - column:
+                  name: flag_emoji
+                  type: VARCHAR(10)
+              - column:
+                  name: region
+                  type: VARCHAR(50)
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - sql:
+            sql: SELECT platform_master.apply_updated_at_trigger('platform_master', 'countries');
+
+  - changeSet:
+      id: "202501010010-countries-seed"
+      author: "mana-community-dev"
+      context: "default"
+      comment: "Seed countries data"
+      logicalFilePath: "db/changelog/platform/master-data/202501010010-countries-seed.yaml"
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              INSERT INTO platform_master.countries (code, code3, name, dialing_code, currency_code) VALUES
+              ('IN', 'IND', 'India', '+91', 'INR'),
+              ('US', 'USA', 'USA', '+1', 'USD'),
+              ('GB', 'GBR', 'UK', '+44', 'GBP'),
+              ('AU', 'AUS', 'Australia', '+61', 'AUD'),
+              ('AE', 'ARE', 'UAE', '+971', 'AED'),
+              ('SG', 'SGP', 'Singapore', '+65', 'SGD'),
+              ('CA', 'CAN', 'Canada', '+1', 'CAD'),
+              ('DE', 'DEU', 'Germany', '+49', 'EUR'),
+              ('FR', 'FRA', 'France', '+33', 'EUR'),
+              ('JP', 'JPN', 'Japan', '+81', 'JPY'),
+              ('ZA', 'ZAF', 'South Africa', '+27', 'ZAR'),
+              ('BR', 'BRA', 'Brazil', '+55', 'BRL'),
+              ('CN', 'CHN', 'China', '+86', 'CNY'),
+              ('RU', 'RUS', 'Russia', '+7', 'RUB'),
+              ('NZ', 'NZL', 'New Zealand', '+64', 'NZD'),
+              ('MY', 'MYS', 'Malaysia', '+60', 'MYR'),
+              ('LK', 'LKA', 'Sri Lanka', '+94', 'LKR'),
+              ('PK', 'PAK', 'Pakistan', '+92', 'PKR'),
+              ('BD', 'BGD', 'Bangladesh', '+880', 'BDT'),
+              ('NP', 'NPL', 'Nepal', '+977', 'NPR')
+              ON CONFLICT (code) DO NOTHING;
+      rollback:
+        - sql:
+            sql: "DELETE FROM platform_master.countries WHERE code IN ('IN','US','GB','AU','AE','SG','CA','DE','FR','JP','ZA','BR','CN','RU','NZ','MY','LK','PK','BD','NP');"
+  
+  - changeSet:
+      id: "202501010010-countries-rollback-table"
+      author: "mana-community-dev"
+      context: "default"
+      logicalFilePath: "db/changelog/platform/master-data/202501010010-countries-rollback-table.yaml"
+      changes:
+        - empty: {}
+      rollback:
+        - dropTable:
+            schemaName: platform_master
+            tableName: countries

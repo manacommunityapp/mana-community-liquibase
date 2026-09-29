@@ -1,0 +1,240 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202503010030-idx-sports-venues-tenant-city"
+      author: "mana-community-dev"
+      labels: "sports,index,v1.0"
+      context: "default"
+      comment: "Create index on venues tenant and city"
+      logicalFilePath: "db/changelog/domains/sports/indexes/202503010030-sports-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_sports_venues_tenant_city
+      changes:
+        - sql:
+            sql: CREATE INDEX idx_sports_venues_tenant_city ON sports.venues (tenant_id, city) WHERE deleted = FALSE;
+      rollback:
+        - sql:
+            sql: DROP INDEX IF EXISTS sports.idx_sports_venues_tenant_city;
+
+  - changeSet:
+      id: "202503010031-idx-courts-venue"
+      author: "mana-community-dev"
+      labels: "sports,index,v1.0"
+      context: "default"
+      comment: "Create index on courts venue"
+      logicalFilePath: "db/changelog/domains/sports/indexes/202503010030-sports-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_courts_venue
+      changes:
+        - sql:
+            sql: CREATE INDEX idx_courts_venue ON sports.courts (venue_id, is_available);
+      rollback:
+        - sql:
+            sql: DROP INDEX IF EXISTS sports.idx_courts_venue;
+
+  - changeSet:
+      id: "202503010032-idx-teams-tenant-sport"
+      author: "mana-community-dev"
+      labels: "sports,index,v1.0"
+      context: "default"
+      comment: "Create index on teams tenant and sport"
+      logicalFilePath: "db/changelog/domains/sports/indexes/202503010030-sports-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_teams_tenant_sport
+      changes:
+        - sql:
+            sql: CREATE INDEX idx_teams_tenant_sport ON sports.teams (tenant_id, sports_meta_id, status);
+      rollback:
+        - sql:
+            sql: DROP INDEX IF EXISTS sports.idx_teams_tenant_sport;
+
+  - changeSet:
+      id: "202503010033-idx-players-user-sport"
+      author: "mana-community-dev"
+      labels: "sports,index,v1.0"
+      context: "default"
+      comment: "Create index on players user and sport"
+      logicalFilePath: "db/changelog/domains/sports/indexes/202503010030-sports-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_players_user_sport
+      changes:
+        - sql:
+            sql: CREATE INDEX idx_players_user_sport ON sports.players (user_id, sports_meta_id, tenant_id);
+      rollback:
+        - sql:
+            sql: DROP INDEX IF EXISTS sports.idx_players_user_sport;
+
+  - changeSet:
+      id: "202503010034-idx-players-team"
+      author: "mana-community-dev"
+      labels: "sports,index,v1.0"
+      context: "default"
+      comment: "Create index on players team"
+      logicalFilePath: "db/changelog/domains/sports/indexes/202503010030-sports-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_players_team
+      changes:
+        - sql:
+            sql: CREATE INDEX idx_players_team ON sports.players (team_id, status) WHERE deleted = FALSE;
+      rollback:
+        - sql:
+            sql: DROP INDEX IF EXISTS sports.idx_players_team;
+
+  - changeSet:
+      id: "202503010035-idx-tournaments-tenant-status"
+      author: "mana-community-dev"
+      labels: "sports,index,v1.0"
+      context: "default"
+      comment: "Create index on tournaments tenant and status"
+      logicalFilePath: "db/changelog/domains/sports/indexes/202503010030-sports-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_tournaments_tenant_status
+      changes:
+        - sql:
+            sql: CREATE INDEX idx_tournaments_tenant_status ON sports.tournaments (tenant_id, tournament_status, start_date);
+      rollback:
+        - sql:
+            sql: DROP INDEX IF EXISTS sports.idx_tournaments_tenant_status;
+
+  - changeSet:
+      id: "202503010036-idx-tournament-matches-tournament"
+      author: "mana-community-dev"
+      labels: "sports,index,v1.0"
+      context: "default"
+      comment: "Create index on tournament matches tournament"
+      logicalFilePath: "db/changelog/domains/sports/indexes/202503010030-sports-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_tournament_matches_tournament
+      changes:
+        - sql:
+            sql: CREATE INDEX idx_tournament_matches_tournament ON sports.tournament_matches (tournament_id, round_number, match_status);
+      rollback:
+        - sql:
+            sql: DROP INDEX IF EXISTS sports.idx_tournament_matches_tournament;
+
+  - changeSet:
+      id: "202503010037-idx-match-standings-tournament-points"
+      author: "mana-community-dev"
+      labels: "sports,index,v1.0"
+      context: "default"
+      comment: "Create index on match standings points"
+      logicalFilePath: "db/changelog/domains/sports/indexes/202503010030-sports-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_match_standings_tournament_points
+      changes:
+        - sql:
+            sql: CREATE INDEX idx_match_standings_tournament_points ON sports.match_standings (tournament_id, points DESC, net_run_rate DESC);
+      rollback:
+        - sql:
+            sql: DROP INDEX IF EXISTS sports.idx_match_standings_tournament_points;
+
+  - changeSet:
+      id: "202503010038-idx-auction-bids-player"
+      author: "mana-community-dev"
+      labels: "sports,index,v1.0"
+      context: "default"
+      comment: "Create index on auction bids player"
+      logicalFilePath: "db/changelog/domains/sports/indexes/202503010030-sports-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_auction_bids_player
+      changes:
+        - sql:
+            sql: CREATE INDEX idx_auction_bids_player ON sports.auction_bids (auction_config_id, player_id, bid_placed_at DESC);
+      rollback:
+        - sql:
+            sql: DROP INDEX IF EXISTS sports.idx_auction_bids_player;
+
+  - changeSet:
+      id: "202503010039-idx-auction-bids-team"
+      author: "mana-community-dev"
+      labels: "sports,index,v1.0"
+      context: "default"
+      comment: "Create index on auction bids team"
+      logicalFilePath: "db/changelog/domains/sports/indexes/202503010030-sports-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_auction_bids_team
+      changes:
+        - sql:
+            sql: CREATE INDEX idx_auction_bids_team ON sports.auction_bids (bidding_team_id, bid_status);
+      rollback:
+        - sql:
+            sql: DROP INDEX IF EXISTS sports.idx_auction_bids_team;
+
+  - changeSet:
+      id: "202503010039-idx-players-auction"
+      author: "mana-community-dev"
+      labels: "sports,index,v1.0"
+      context: "default"
+      comment: "Create index on players auction"
+      logicalFilePath: "db/changelog/domains/sports/indexes/202503010030-sports-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_players_auction
+      changes:
+        - sql:
+            sql: CREATE INDEX idx_players_auction ON sports.players (tenant_id, sports_meta_id, is_available_for_auction) WHERE is_available_for_auction = TRUE;
+      rollback:
+        - sql:
+            sql: DROP INDEX IF EXISTS sports.idx_players_auction;
+
+  - changeSet:
+      id: "202503010039-idx-teams-metadata"
+      author: "mana-community-dev"
+      labels: "sports,index,v1.0"
+      context: "default"
+      comment: "Create index on teams metadata"
+      logicalFilePath: "db/changelog/domains/sports/indexes/202503010030-sports-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_teams_metadata
+      changes:
+        - sql:
+            sql: CREATE INDEX idx_teams_metadata ON sports.teams USING GIN (metadata) WHERE metadata IS NOT NULL;
+      rollback:
+        - sql:
+            sql: DROP INDEX IF EXISTS sports.idx_teams_metadata;

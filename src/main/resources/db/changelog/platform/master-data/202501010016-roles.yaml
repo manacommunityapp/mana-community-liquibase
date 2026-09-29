@@ -1,0 +1,152 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202501010016-roles"
+      author: "mana-community-dev"
+      labels: "platform,schema,v1.0"
+      context: "default"
+      comment: "Create roles table and seed data"
+      logicalFilePath: "db/changelog/platform/master-data/202501010016-roles.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: platform_master
+                tableName: roles
+      changes:
+        - createTable:
+            schemaName: platform_master
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(100)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: display_name
+                  type: VARCHAR(200)
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: role_level
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: is_system_role
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: is_tenant_specific
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+              - column:
+                  name: parent_role_id
+                  type: BIGINT
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableSchemaName: platform_master
+            baseTableName: roles
+            baseColumnNames: parent_role_id
+            referencedTableSchemaName: platform_master
+            referencedTableName: roles
+            referencedColumnNames: id
+            constraintName: fk_roles_parent_role
+        - sql:
+            sql: SELECT platform_master.apply_updated_at_trigger('platform_master', 'roles');
+
+  - changeSet:
+      id: "202501010016-roles-seed"
+      author: "mana-community-dev"
+      context: "default"
+      comment: "Seed roles data"
+      logicalFilePath: "db/changelog/platform/master-data/202501010016-roles-seed.yaml"
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              INSERT INTO platform_master.roles (name, display_name, role_level, is_system_role, is_tenant_specific) VALUES
+              ('SUPER_ADMIN', 'Super Admin', 100, true, false),
+              ('PLATFORM_ADMIN', 'Platform Admin', 90, true, false),
+              ('TENANT_ADMIN', 'Tenant Admin', 80, false, true),
+              ('COMMUNITY_MANAGER', 'Community Manager', 70, false, true),
+              ('SPORTS_COORDINATOR', 'Sports Coordinator', 60, false, true),
+              ('EVENTS_COORDINATOR', 'Events Coordinator', 55, false, true),
+              ('TREASURER', 'Treasurer', 50, false, true),
+              ('AUDITOR', 'Auditor', 45, false, true),
+              ('MEMBER_PREMIUM', 'Premium Member', 30, false, true),
+              ('MEMBER', 'Member', 20, false, true),
+              ('GUEST', 'Guest', 5, false, true)
+              ON CONFLICT (name) DO NOTHING;
+      rollback:
+        - sql:
+            sql: "DELETE FROM platform_master.roles WHERE name IN ('SUPER_ADMIN','PLATFORM_ADMIN','TENANT_ADMIN','COMMUNITY_MANAGER','SPORTS_COORDINATOR','EVENTS_COORDINATOR','TREASURER','AUDITOR','MEMBER_PREMIUM','MEMBER','GUEST');"
+            
+  - changeSet:
+      id: "202501010016-roles-rollback-table"
+      author: "mana-community-dev"
+      context: "default"
+      logicalFilePath: "db/changelog/platform/master-data/202501010016-roles-rollback-table.yaml"
+      changes:
+        - empty: {}
+      rollback:
+        - dropTable:
+            schemaName: platform_master
+            tableName: roles

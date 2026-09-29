@@ -1,0 +1,143 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202504010014-event-schedules"
+      author: "mana-community-dev"
+      labels: "events,tables,v1.0"
+      context: "default"
+      comment: "Create event_schedules table"
+      logicalFilePath: "db/changelog/domains/events/tables/202504010014-event-schedules.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: events
+                tableName: event_schedules
+      changes:
+        - createTable:
+            schemaName: events
+            tableName: event_schedules
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_event_schedules
+              - column:
+                  name: event_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: day_number
+                  type: INTEGER
+                  defaultValueNumeric: 1
+              - column:
+                  name: schedule_date
+                  type: DATE
+              - column:
+                  name: start_time
+                  type: TIME
+                  constraints:
+                    nullable: false
+              - column:
+                  name: end_time
+                  type: TIME
+                  constraints:
+                    nullable: false
+              - column:
+                  name: title
+                  type: VARCHAR(400)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: session_type
+                  type: VARCHAR(100)
+              - column:
+                  name: location_within_venue
+                  type: VARCHAR(200)
+              - column:
+                  name: speaker_or_host
+                  type: VARCHAR(300)
+              - column:
+                  name: sports_match_id
+                  type: BIGINT
+              - column:
+                  name: is_mandatory
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: max_attendees
+                  type: INTEGER
+              - column:
+                  name: resources_required
+                  type: JSONB
+              - column:
+                  name: sort_order
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: metadata
+                  type: JSONB
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+      rollback:
+        - dropTable:
+            schemaName: events
+            tableName: event_schedules

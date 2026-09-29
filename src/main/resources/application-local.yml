@@ -1,0 +1,18 @@
+# ═══════════════════════════════════════════════════════════
+#  LOCAL PROFILE — Developer workstation
+# ═══════════════════════════════════════════════════════════
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=manacommunity
+    username: postgres
+    password: mana@community@8008
+
+  liquibase:
+    contexts: default,local,dev
+    enabled: true
+
+logging:
+  level:
+    liquibase: DEBUG
+    com.manacommunity: DEBUG
+    org.springframework.jdbc: TRACE

@@ -1,0 +1,141 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202502010050-seed-auth-tenant"
+      author: "mana-community-dev"
+      labels: "auth,seed,v1.0"
+      context: "default,dev"
+      comment: "Seed initial platform tenant"
+      logicalFilePath: "db/changelog/domains/auth/seed/202502010050-auth-seed.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - sqlCheck:
+                expectedResult: 1
+                sql: SELECT COUNT(*) FROM platform_master.tenants WHERE id = 1
+      changes:
+        - insert:
+            schemaName: platform_master
+            tableName: tenants
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 1
+              - column:
+                  name: tenant_code
+                  value: 'MANA_PLATFORM'
+              - column:
+                  name: name
+                  value: 'Mana Community Platform'
+              - column:
+                  name: contact_email
+                  value: 'admin@manacommunity.com'
+              - column:
+                  name: status
+                  value: 'ACTIVE'
+
+  - changeSet:
+      id: "202502010050-seed-auth-superadmin"
+      author: "mana-community-dev"
+      labels: "auth,seed,v1.0"
+      context: "default,dev"
+      comment: "Seed initial super admin user"
+      logicalFilePath: "db/changelog/domains/auth/seed/202502010050-auth-seed.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - sqlCheck:
+                expectedResult: 1
+                sql: SELECT COUNT(*) FROM auth.users WHERE id = 1
+      changes:
+        - insert:
+            schemaName: auth
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 1
+              - column:
+                  name: tenant_id
+                  valueNumeric: 1
+              - column:
+                  name: username
+                  value: 'superadmin'
+              - column:
+                  name: email
+                  value: 'admin@manacommunity.com'
+              - column:
+                  name: first_name
+                  value: 'Super'
+              - column:
+                  name: last_name
+                  value: 'Admin'
+              - column:
+                  name: password_hash
+                  value: '$2a$12$placeholder_bcrypt_hash_change_on_first_login'
+              - column:
+                  name: is_system_user
+                  valueBoolean: true
+              - column:
+                  name: status
+                  value: 'ACTIVE'
+              - column:
+                  name: created_by
+                  valueNumeric: 0
+              - column:
+                  name: updated_by
+                  valueNumeric: 0
+
+  - changeSet:
+      id: "202502010050-seed-auth-superadmin-profile"
+      author: "mana-community-dev"
+      labels: "auth,seed,v1.0"
+      context: "default,dev"
+      comment: "Seed super admin user profile"
+      logicalFilePath: "db/changelog/domains/auth/seed/202502010050-auth-seed.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - sqlCheck:
+                expectedResult: 1
+                sql: SELECT COUNT(*) FROM auth.user_profiles WHERE user_id = 1
+      changes:
+        - insert:
+            schemaName: auth
+            tableName: user_profiles
+            columns:
+              - column:
+                  name: user_id
+                  valueNumeric: 1
+              - column:
+                  name: tenant_id
+                  valueNumeric: 1
+              - column:
+                  name: status
+                  value: 'ACTIVE'
+
+  - changeSet:
+      id: "202502010050-seed-auth-superadmin-role"
+      author: "mana-community-dev"
+      labels: "auth,seed,v1.0"
+      context: "default,dev"
+      comment: "Assign super admin role to superadmin user"
+      logicalFilePath: "db/changelog/domains/auth/seed/202502010050-auth-seed.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - sqlCheck:
+                expectedResult: 1
+                sql: SELECT COUNT(*) FROM auth.user_roles WHERE user_id = 1
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO auth.user_roles (user_id, role_id, tenant_id, granted_by)
+              SELECT 1, id, 1, 0 FROM platform_master.roles WHERE name = 'SUPER_ADMIN';

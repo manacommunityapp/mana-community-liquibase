@@ -1,0 +1,16 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202503010001-create-sports-schema"
+      author: "mana-community-dev"
+      labels: "sports,schema,v1.0"
+      context: "default"
+      comment: "Create sports schema"
+      logicalFilePath: "db/changelog/domains/sports/schema/202503010001-sports-schema.yaml"
+      runInTransaction: false
+      changes:
+        - sql:
+            splitStatements: true
+            sql: CREATE SCHEMA IF NOT EXISTS sports;
+      rollback:
+        - sql:
+            sql: DROP SCHEMA IF EXISTS sports CASCADE;

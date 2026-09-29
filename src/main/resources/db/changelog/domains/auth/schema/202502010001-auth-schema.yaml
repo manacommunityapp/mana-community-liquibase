@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202502010001-create-auth-schema"
+      author: "mana-community-dev"
+      labels: "auth,schema,v1.0"
+      context: "default"
+      comment: "Create auth schema"
+      logicalFilePath: "db/changelog/domains/auth/schema/202502010001-auth-schema.yaml"
+      runInTransaction: false
+      changes:
+        - sql:
+            splitStatements: true
+            sql: |
+              CREATE SCHEMA IF NOT EXISTS auth;
+              COMMENT ON SCHEMA auth IS 'Authentication Domain';
+              GRANT USAGE ON SCHEMA auth TO manacommunity_app;
+      rollback:
+        - sql:
+            sql: DROP SCHEMA IF EXISTS auth CASCADE;

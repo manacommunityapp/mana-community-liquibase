@@ -1,0 +1,130 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202501010052-feature-flags-table"
+      author: "mana-community-dev"
+      labels: "platform,schema,v1.0"
+      context: "default"
+      comment: "Create feature flags table"
+      logicalFilePath: "db/changelog/platform/configuration/202501010052-feature-flags-table.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: platform_config
+                tableName: feature_flags
+      changes:
+        - createTable:
+            schemaName: platform_config
+            tableName: feature_flags
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: feature_key
+                  type: VARCHAR(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: feature_name
+                  type: VARCHAR(300)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: is_enabled
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: rollout_percentage
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: allowed_plans
+                  type: VARCHAR(500)
+              - column:
+                  name: config
+                  type: JSONB
+              - column:
+                  name: expires_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            schemaName: platform_config
+            tableName: feature_flags
+            constraintName: uq_feature_flags_tenant_key
+            columnNames: tenant_id, feature_key
+        - addForeignKeyConstraint:
+            baseTableSchemaName: platform_config
+            baseTableName: feature_flags
+            baseColumnNames: tenant_id
+            referencedTableSchemaName: platform_master
+            referencedTableName: tenants
+            referencedColumnNames: id
+            constraintName: fk_feature_flags_tenant
+        - sql:
+            sql: SELECT platform_master.apply_updated_at_trigger('platform_config', 'feature_flags');
+      rollback:
+        - dropTable:
+            schemaName: platform_config
+            tableName: feature_flags

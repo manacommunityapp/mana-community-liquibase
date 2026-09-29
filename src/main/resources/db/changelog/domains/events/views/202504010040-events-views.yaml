@@ -1,0 +1,50 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202504010040-events-views"
+      author: "mana-community-dev"
+      labels: "events,view,v1.0"
+      context: "default"
+      comment: "Create event views"
+      logicalFilePath: "db/changelog/domains/events/views/202504010040-events-views.yaml"
+      runInTransaction: false
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              CREATE OR REPLACE VIEW events.vw_upcoming_events AS
+              SELECT 
+                e.id, 
+                e.title, 
+                e.event_type, 
+                c.name AS category_name, 
+                e.venue_name, 
+                e.city, 
+                e.start_datetime, 
+                e.end_datetime, 
+                e.entry_fee, 
+                e.current_registrations, 
+                e.max_participants, 
+                e.banner_url, 
+                e.is_featured
+              FROM events.events e
+              LEFT JOIN events.event_categories c ON e.category_id = c.id
+              WHERE e.event_status IN ('PUBLISHED','REGISTRATION_OPEN') 
+                AND e.start_datetime > NOW();
+                
+              CREATE OR REPLACE VIEW events.vw_event_registration_summary AS
+              SELECT 
+                e.id AS event_id,
+                e.title,
+                COUNT(r.id) AS total_registered,
+                SUM(CASE WHEN r.registration_status = 'CONFIRMED' THEN 1 ELSE 0 END) AS confirmed,
+                SUM(CASE WHEN r.registration_status = 'WAITLISTED' THEN 1 ELSE 0 END) AS waitlisted,
+                SUM(CASE WHEN r.registration_status = 'CANCELLED' THEN 1 ELSE 0 END) AS cancelled,
+                SUM(r.payment_amount) AS total_revenue
+              FROM events.events e
+              LEFT JOIN events.event_registrations r ON e.id = r.event_id
+              GROUP BY e.id, e.title;
+      rollback:
+        - sql:
+            sql: |
+              DROP VIEW IF EXISTS events.vw_upcoming_events;
+              DROP VIEW IF EXISTS events.vw_event_registration_summary;

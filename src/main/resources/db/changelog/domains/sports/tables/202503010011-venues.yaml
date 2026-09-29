@@ -1,0 +1,156 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202503010011-create-venues"
+      author: "mana-community-dev"
+      labels: "sports,table,v1.0"
+      context: "default"
+      comment: "Create venues table"
+      logicalFilePath: "db/changelog/domains/sports/tables/202503010011-venues.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: sports
+                tableName: venues
+      changes:
+        - createTable:
+            schemaName: sports
+            tableName: venues
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_venues
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(300)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: short_name
+                  type: VARCHAR(100)
+              - column:
+                  name: venue_type
+                  type: VARCHAR(50)
+              - column:
+                  name: address_line1
+                  type: VARCHAR(300)
+              - column:
+                  name: address_line2
+                  type: VARCHAR(300)
+              - column:
+                  name: city
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: state
+                  type: VARCHAR(100)
+              - column:
+                  name: country_code
+                  type: CHAR(2)
+              - column:
+                  name: postal_code
+                  type: VARCHAR(20)
+              - column:
+                  name: latitude
+                  type: DECIMAL(9,6)
+              - column:
+                  name: longitude
+                  type: DECIMAL(9,6)
+              - column:
+                  name: google_maps_url
+                  type: VARCHAR(1000)
+              - column:
+                  name: total_courts
+                  type: INTEGER
+                  defaultValueNumeric: 1
+              - column:
+                  name: amenities
+                  type: JSONB
+              - column:
+                  name: images
+                  type: JSONB
+              - column:
+                  name: contact_name
+                  type: VARCHAR(200)
+              - column:
+                  name: contact_phone
+                  type: VARCHAR(30)
+              - column:
+                  name: contact_email
+                  type: VARCHAR(255)
+              - column:
+                  name: operating_hours
+                  type: JSONB
+              - column:
+                  name: is_available
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+              - column:
+                  name: capacity
+                  type: INTEGER
+              - column:
+                  name: metadata
+                  type: JSONB
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+      rollback:
+        - dropTable:
+            schemaName: sports
+            tableName: venues

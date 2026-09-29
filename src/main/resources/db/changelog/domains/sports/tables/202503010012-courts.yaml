@@ -1,0 +1,148 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202503010012-create-courts"
+      author: "mana-community-dev"
+      labels: "sports,table,v1.0"
+      context: "default"
+      comment: "Create courts table"
+      logicalFilePath: "db/changelog/domains/sports/tables/202503010012-courts.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: sports
+                tableName: courts
+      changes:
+        - createTable:
+            schemaName: sports
+            tableName: courts
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_courts
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: venue_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sports_meta_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: court_number
+                  type: INTEGER
+              - column:
+                  name: surface_type
+                  type: VARCHAR(100)
+              - column:
+                  name: length_meters
+                  type: DECIMAL(6,2)
+              - column:
+                  name: width_meters
+                  type: DECIMAL(6,2)
+              - column:
+                  name: max_players
+                  type: INTEGER
+              - column:
+                  name: has_lighting
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: has_scoreboard
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: has_live_streaming
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: hourly_rate
+                  type: DECIMAL(10,2)
+              - column:
+                  name: peak_hours_rate
+                  type: DECIMAL(10,2)
+              - column:
+                  name: peak_hours
+                  type: JSONB
+              - column:
+                  name: is_available
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+              - column:
+                  name: maintenance_notes
+                  type: TEXT
+              - column:
+                  name: images
+                  type: JSONB
+              - column:
+                  name: metadata
+                  type: JSONB
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+      rollback:
+        - dropTable:
+            schemaName: sports
+            tableName: courts

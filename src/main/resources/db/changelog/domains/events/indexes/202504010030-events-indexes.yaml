@@ -1,0 +1,268 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202504010030-idx-events-tenant-status"
+      author: "mana-community-dev"
+      labels: "events,index,v1.0"
+      context: "default"
+      comment: "Create index on events tenant status date"
+      logicalFilePath: "db/changelog/domains/events/indexes/202504010030-events-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_events_tenant_status_date
+      changes:
+        - createIndex:
+            indexName: idx_events_tenant_status_date
+            schemaName: events
+            tableName: events
+            columns:
+              - column: { name: tenant_id }
+              - column: { name: event_status }
+              - column: { name: start_datetime }
+      rollback:
+        - dropIndex:
+            indexName: idx_events_tenant_status_date
+            schemaName: events
+            tableName: events
+
+  - changeSet:
+      id: "202504010030-idx-events-tenant-type"
+      author: "mana-community-dev"
+      labels: "events,index,v1.0"
+      context: "default"
+      comment: "Create index on events tenant type date"
+      logicalFilePath: "db/changelog/domains/events/indexes/202504010030-events-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_events_tenant_type
+      changes:
+        - createIndex:
+            indexName: idx_events_tenant_type
+            schemaName: events
+            tableName: events
+            columns:
+              - column: { name: tenant_id }
+              - column: { name: event_type }
+              - column: { name: start_datetime }
+      rollback:
+        - dropIndex:
+            indexName: idx_events_tenant_type
+            schemaName: events
+            tableName: events
+
+  - changeSet:
+      id: "202504010030-idx-events-organizer"
+      author: "mana-community-dev"
+      labels: "events,index,v1.0"
+      context: "default"
+      comment: "Create index on events organizer"
+      logicalFilePath: "db/changelog/domains/events/indexes/202504010030-events-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_events_organizer
+      changes:
+        - createIndex:
+            indexName: idx_events_organizer
+            schemaName: events
+            tableName: events
+            columns:
+              - column: { name: organizer_user_id }
+              - column: { name: event_status }
+      rollback:
+        - dropIndex:
+            indexName: idx_events_organizer
+            schemaName: events
+            tableName: events
+
+  - changeSet:
+      id: "202504010030-idx-events-tags"
+      author: "mana-community-dev"
+      labels: "events,index,v1.0"
+      context: "default"
+      comment: "Create GIN index on events tags"
+      logicalFilePath: "db/changelog/domains/events/indexes/202504010030-events-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_events_tags
+      changes:
+        - sql:
+            sql: CREATE INDEX idx_events_tags ON events.events USING GIN (tags) WHERE tags IS NOT NULL;
+      rollback:
+        - dropIndex:
+            indexName: idx_events_tags
+            schemaName: events
+            tableName: events
+
+  - changeSet:
+      id: "202504010030-idx-registrations-event-status"
+      author: "mana-community-dev"
+      labels: "events,index,v1.0"
+      context: "default"
+      comment: "Create index on event registrations status"
+      logicalFilePath: "db/changelog/domains/events/indexes/202504010030-events-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_registrations_event_status
+      changes:
+        - createIndex:
+            indexName: idx_registrations_event_status
+            schemaName: events
+            tableName: event_registrations
+            columns:
+              - column: { name: event_id }
+              - column: { name: registration_status }
+      rollback:
+        - dropIndex:
+            indexName: idx_registrations_event_status
+            schemaName: events
+            tableName: event_registrations
+
+  - changeSet:
+      id: "202504010030-idx-registrations-user"
+      author: "mana-community-dev"
+      labels: "events,index,v1.0"
+      context: "default"
+      comment: "Create index on event registrations user"
+      logicalFilePath: "db/changelog/domains/events/indexes/202504010030-events-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_registrations_user
+      changes:
+        - createIndex:
+            indexName: idx_registrations_user
+            schemaName: events
+            tableName: event_registrations
+            columns:
+              - column: { name: user_id }
+              - column: { name: registration_status }
+      rollback:
+        - dropIndex:
+            indexName: idx_registrations_user
+            schemaName: events
+            tableName: event_registrations
+
+  - changeSet:
+      id: "202504010030-idx-registrations-number"
+      author: "mana-community-dev"
+      labels: "events,index,v1.0"
+      context: "default"
+      comment: "Create index on event registrations number"
+      logicalFilePath: "db/changelog/domains/events/indexes/202504010030-events-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_registrations_number
+      changes:
+        - createIndex:
+            indexName: idx_registrations_number
+            schemaName: events
+            tableName: event_registrations
+            columns:
+              - column: { name: registration_number }
+      rollback:
+        - dropIndex:
+            indexName: idx_registrations_number
+            schemaName: events
+            tableName: event_registrations
+
+  - changeSet:
+      id: "202504010030-idx-schedules-event-date"
+      author: "mana-community-dev"
+      labels: "events,index,v1.0"
+      context: "default"
+      comment: "Create index on event schedules date"
+      logicalFilePath: "db/changelog/domains/events/indexes/202504010030-events-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_schedules_event_date
+      changes:
+        - createIndex:
+            indexName: idx_schedules_event_date
+            schemaName: events
+            tableName: event_schedules
+            columns:
+              - column: { name: event_id }
+              - column: { name: schedule_date }
+              - column: { name: start_time }
+      rollback:
+        - dropIndex:
+            indexName: idx_schedules_event_date
+            schemaName: events
+            tableName: event_schedules
+
+  - changeSet:
+      id: "202504010030-idx-results-event"
+      author: "mana-community-dev"
+      labels: "events,index,v1.0"
+      context: "default"
+      comment: "Create index on event results"
+      logicalFilePath: "db/changelog/domains/events/indexes/202504010030-events-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_results_event
+      changes:
+        - createIndex:
+            indexName: idx_results_event
+            schemaName: events
+            tableName: event_results
+            columns:
+              - column: { name: event_id }
+              - column: { name: position }
+      rollback:
+        - dropIndex:
+            indexName: idx_results_event
+            schemaName: events
+            tableName: event_results
+
+  - changeSet:
+      id: "202504010030-idx-notifications-event"
+      author: "mana-community-dev"
+      labels: "events,index,v1.0"
+      context: "default"
+      comment: "Create index on event notifications"
+      logicalFilePath: "db/changelog/domains/events/indexes/202504010030-events-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_notifications_event_trigger
+      changes:
+        - createIndex:
+            indexName: idx_notifications_event_trigger
+            schemaName: events
+            tableName: event_notifications
+            columns:
+              - column: { name: event_id }
+              - column: { name: trigger_at }
+              - column: { name: is_sent }
+      rollback:
+        - dropIndex:
+            indexName: idx_notifications_event_trigger
+            schemaName: events
+            tableName: event_notifications

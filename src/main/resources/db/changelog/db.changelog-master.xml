@@ -12,5 +12,8 @@
     <include file="db/changelog/v1.0.0/04_user_sessions.xml"               relativeToChangelogFile="false"/>
     <include file="db/changelog/v1.0.0/05_sports_event_auction_enabled.xml" relativeToChangelogFile="false"/>
     <include file="db/changelog/v1.0.0/06_auction_optimistic_locking.xml"  relativeToChangelogFile="false"/>
+    <include file="db/changelog/v1.0.0/07_inventory_assets_and_expenses.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/v1.0.0/08_warehouse_and_stock_operations.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/v1.0.0/09_menu_permissions.xml" relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

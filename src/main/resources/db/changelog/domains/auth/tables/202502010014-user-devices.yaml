@@ -1,0 +1,133 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202502010014-create-user-devices"
+      author: "mana-community-dev"
+      labels: "auth,table,user_devices,v1.0"
+      context: "default"
+      comment: "Create user devices table"
+      logicalFilePath: "db/changelog/domains/auth/tables/202502010014-user-devices.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: auth
+                tableName: user_devices
+      changes:
+        - createTable:
+            schemaName: auth
+            tableName: user_devices
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_user_devices_user
+                    references: auth.users(id)
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: device_fingerprint
+                  type: VARCHAR(500)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: device_name
+                  type: VARCHAR(200)
+              - column:
+                  name: device_type
+                  type: VARCHAR(50)
+              - column:
+                  name: os
+                  type: VARCHAR(100)
+              - column:
+                  name: os_version
+                  type: VARCHAR(50)
+              - column:
+                  name: app_version
+                  type: VARCHAR(50)
+              - column:
+                  name: push_token
+                  type: VARCHAR(500)
+              - column:
+                  name: push_provider
+                  type: VARCHAR(50)
+              - column:
+                  name: is_trusted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: trusted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: last_seen_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: ip_address
+                  type: VARCHAR(45)
+              - column:
+                  name: metadata
+                  type: JSONB
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+      rollback:
+        - dropTable:
+            schemaName: auth
+            tableName: user_devices

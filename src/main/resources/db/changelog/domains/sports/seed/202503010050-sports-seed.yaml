@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202503010050-seed-sports-meta"
+      author: "mana-community-dev"
+      labels: "sports,seed,v1.0"
+      context: "default,dev"
+      comment: "Seed sports meta for tenant 1"
+      logicalFilePath: "db/changelog/domains/sports/seed/202503010050-sports-seed.yaml"
+      runInTransaction: false
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO sports.sports_meta (tenant_id, sports_category_id, custom_name, scoring_system, created_by)
+              SELECT 1, id, name, '{"win":3,"draw":1,"loss":0}'::jsonb, 0
+              FROM platform_master.sports_categories 
+              WHERE name IN ('CRICKET', 'FOOTBALL', 'BADMINTON', 'TENNIS', 'VOLLEYBALL')
+              ON CONFLICT (tenant_id, sports_category_id) DO NOTHING;
+      rollback:
+        - sql:
+            sql: |
+              DELETE FROM sports.sports_meta WHERE tenant_id = 1;

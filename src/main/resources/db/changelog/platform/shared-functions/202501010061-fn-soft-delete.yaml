@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202501010061-fn-soft-delete"
+      author: "mana-community-dev"
+      labels: "platform,functions,v1.0"
+      context: "default"
+      comment: "Create soft delete function"
+      logicalFilePath: "db/changelog/platform/shared-functions/202501010061-fn-soft-delete.yaml"
+      runInTransaction: false
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              CREATE OR REPLACE FUNCTION platform_master.fn_soft_delete(p_schema TEXT, p_table TEXT, p_id BIGINT, p_deleted_by BIGINT)
+              RETURNS void AS $$
+              BEGIN
+                  EXECUTE format('
+                      UPDATE %I.%I
+                      SET deleted = true,
+                          deleted_at = CURRENT_TIMESTAMP,
+                          deleted_by = %L,
+                          status = ''DELETED''
+                      WHERE id = %L
+                  ', p_schema, p_table, p_deleted_by, p_id);
+              END;
+              $$ LANGUAGE plpgsql;
+      rollback:
+        - sql:
+            splitStatements: false
+            sql: |
+              DROP FUNCTION IF EXISTS platform_master.fn_soft_delete(TEXT, TEXT, BIGINT, BIGINT);

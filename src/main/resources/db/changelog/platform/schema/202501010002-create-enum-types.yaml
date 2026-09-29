@@ -1,0 +1,69 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202501010002-create-enum-types"
+      author: "mana-community-dev"
+      labels: "platform,schema,v1.0"
+      context: "default"
+      comment: "Create PostgreSQL ENUM types in platform_master schema"
+      logicalFilePath: "db/changelog/platform/schema/202501010002-create-enum-types.yaml"
+      runInTransaction: false
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              DO $$
+              BEGIN
+                  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'status_type' AND typnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'platform_master')) THEN
+                      CREATE TYPE platform_master.status_type AS ENUM ('ACTIVE', 'INACTIVE', 'PENDING', 'SUSPENDED', 'DELETED', 'ARCHIVED');
+                  END IF;
+
+                  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'gender_type' AND typnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'platform_master')) THEN
+                      CREATE TYPE platform_master.gender_type AS ENUM ('MALE', 'FEMALE', 'OTHER', 'PREFER_NOT_TO_SAY');
+                  END IF;
+
+                  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'kyc_status_type' AND typnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'platform_master')) THEN
+                      CREATE TYPE platform_master.kyc_status_type AS ENUM ('NOT_SUBMITTED', 'PENDING', 'UNDER_REVIEW', 'APPROVED', 'REJECTED', 'EXPIRED');
+                  END IF;
+
+                  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'notification_channel_type' AND typnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'platform_master')) THEN
+                      CREATE TYPE platform_master.notification_channel_type AS ENUM ('EMAIL', 'SMS', 'PUSH', 'WHATSAPP', 'IN_APP');
+                  END IF;
+
+                  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'sports_format_type' AND typnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'platform_master')) THEN
+                      CREATE TYPE platform_master.sports_format_type AS ENUM ('LEAGUE', 'KNOCKOUT', 'GROUP_KNOCKOUT', 'ROUND_ROBIN', 'CUSTOM');
+                  END IF;
+
+                  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'match_status_type' AND typnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'platform_master')) THEN
+                      CREATE TYPE platform_master.match_status_type AS ENUM ('SCHEDULED', 'LIVE', 'COMPLETED', 'CANCELLED', 'POSTPONED', 'FORFEITED');
+                  END IF;
+
+                  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'event_type' AND typnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'platform_master')) THEN
+                      CREATE TYPE platform_master.event_type AS ENUM ('TOURNAMENT', 'EXHIBITION', 'PRACTICE', 'SOCIAL', 'CORPORATE', 'CHARITY');
+                  END IF;
+
+                  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'player_type' AND typnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'platform_master')) THEN
+                      CREATE TYPE platform_master.player_type AS ENUM ('REGISTERED', 'GUEST', 'TRIAL', 'PREMIUM');
+                  END IF;
+
+                  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'payment_status_type' AND typnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'platform_master')) THEN
+                      CREATE TYPE platform_master.payment_status_type AS ENUM ('PENDING', 'COMPLETED', 'FAILED', 'REFUNDED', 'CANCELLED');
+                  END IF;
+
+                  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'device_type' AND typnamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'platform_master')) THEN
+                      CREATE TYPE platform_master.device_type AS ENUM ('MOBILE', 'TABLET', 'DESKTOP', 'SMART_TV', 'OTHER');
+                  END IF;
+              END$$;
+      rollback:
+        - sql:
+            splitStatements: false
+            sql: |
+              DROP TYPE IF EXISTS platform_master.status_type;
+              DROP TYPE IF EXISTS platform_master.gender_type;
+              DROP TYPE IF EXISTS platform_master.kyc_status_type;
+              DROP TYPE IF EXISTS platform_master.notification_channel_type;
+              DROP TYPE IF EXISTS platform_master.sports_format_type;
+              DROP TYPE IF EXISTS platform_master.match_status_type;
+              DROP TYPE IF EXISTS platform_master.event_type;
+              DROP TYPE IF EXISTS platform_master.player_type;
+              DROP TYPE IF EXISTS platform_master.payment_status_type;
+              DROP TYPE IF EXISTS platform_master.device_type;

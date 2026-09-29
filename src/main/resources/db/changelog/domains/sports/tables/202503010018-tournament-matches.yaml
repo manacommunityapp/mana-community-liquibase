@@ -1,0 +1,179 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202503010018-create-tournament-matches"
+      author: "mana-community-dev"
+      labels: "sports,table,v1.0"
+      context: "default"
+      comment: "Create tournament_matches table"
+      logicalFilePath: "db/changelog/domains/sports/tables/202503010018-tournament-matches.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: sports
+                tableName: tournament_matches
+      changes:
+        - createTable:
+            schemaName: sports
+            tableName: tournament_matches
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_tournament_matches
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tournament_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: group_id
+                  type: BIGINT
+              - column:
+                  name: match_number
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: round_number
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: round_name
+                  type: VARCHAR(100)
+              - column:
+                  name: stage
+                  type: VARCHAR(50)
+              - column:
+                  name: team1_id
+                  type: BIGINT
+              - column:
+                  name: team2_id
+                  type: BIGINT
+              - column:
+                  name: venue_id
+                  type: BIGINT
+              - column:
+                  name: court_id
+                  type: BIGINT
+              - column:
+                  name: scheduled_at
+                  type: TIMESTAMP
+              - column:
+                  name: started_at
+                  type: TIMESTAMP
+              - column:
+                  name: completed_at
+                  type: TIMESTAMP
+              - column:
+                  name: match_status
+                  type: VARCHAR(50)
+                  defaultValue: 'SCHEDULED'
+              - column:
+                  name: team1_score
+                  type: JSONB
+              - column:
+                  name: team2_score
+                  type: JSONB
+              - column:
+                  name: winner_team_id
+                  type: BIGINT
+              - column:
+                  name: win_margin
+                  type: VARCHAR(100)
+              - column:
+                  name: is_super_over
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: toss_winner_team_id
+                  type: BIGINT
+              - column:
+                  name: toss_decision
+                  type: VARCHAR(50)
+              - column:
+                  name: umpire1_user_id
+                  type: BIGINT
+              - column:
+                  name: umpire2_user_id
+                  type: BIGINT
+              - column:
+                  name: scorer_user_id
+                  type: BIGINT
+              - column:
+                  name: live_score_url
+                  type: VARCHAR(500)
+              - column:
+                  name: scorecard_url
+                  type: VARCHAR(500)
+              - column:
+                  name: notes
+                  type: TEXT
+              - column:
+                  name: match_highlights
+                  type: JSONB
+              - column:
+                  name: metadata
+                  type: JSONB
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+      rollback:
+        - dropTable:
+            schemaName: sports
+            tableName: tournament_matches

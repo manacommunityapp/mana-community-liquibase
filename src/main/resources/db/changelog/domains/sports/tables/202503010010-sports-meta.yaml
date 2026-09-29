@@ -1,0 +1,131 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202503010010-create-sports-meta"
+      author: "mana-community-dev"
+      labels: "sports,table,v1.0"
+      context: "default"
+      comment: "Create sports meta table"
+      logicalFilePath: "db/changelog/domains/sports/tables/202503010010-sports-meta.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: sports
+                tableName: sports_meta
+      changes:
+        - createTable:
+            schemaName: sports
+            tableName: sports_meta
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_sports_meta
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sports_category_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: custom_name
+                  type: VARCHAR(200)
+              - column:
+                  name: rules_document_url
+                  type: VARCHAR(500)
+              - column:
+                  name: default_match_duration
+                  type: INTEGER
+              - column:
+                  name: overtime_enabled
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: overtime_duration
+                  type: INTEGER
+              - column:
+                  name: scoring_system
+                  type: JSONB
+              - column:
+                  name: tiebreaker_rules
+                  type: JSONB
+              - column:
+                  name: player_registration_fee
+                  type: DECIMAL(12,2)
+                  defaultValueNumeric: 0
+              - column:
+                  name: team_registration_fee
+                  type: DECIMAL(12,2)
+                  defaultValueNumeric: 0
+              - column:
+                  name: is_active
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+              - column:
+                  name: metadata
+                  type: JSONB
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            schemaName: sports
+            tableName: sports_meta
+            columnNames: tenant_id, sports_category_id
+            constraintName: uk_sports_meta_tenant_cat
+      rollback:
+        - dropTable:
+            schemaName: sports
+            tableName: sports_meta

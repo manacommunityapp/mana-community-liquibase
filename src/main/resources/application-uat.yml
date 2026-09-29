@@ -1,0 +1,17 @@
+# ═══════════════════════════════════════════════════════════
+#  UAT PROFILE — User Acceptance Testing environment
+# ═══════════════════════════════════════════════════════════
+spring:
+  datasource:
+    url: ${UAT_DB_URL:jdbc:postgresql://uat-db:5432/manacommunity_db}
+    username: ${UAT_DB_USER:manacommunity}
+    password: ${UAT_DB_PASS:changeme}
+
+  liquibase:
+    contexts: default,uat
+    enabled: true
+
+logging:
+  level:
+    liquibase: INFO
+    com.manacommunity: INFO

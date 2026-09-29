@@ -1,0 +1,180 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202501010050-tenant-config"
+      author: "mana-community-dev"
+      labels: "platform,schema,v1.0"
+      context: "default"
+      comment: "Create tenants table"
+      logicalFilePath: "db/changelog/platform/configuration/202501010050-tenant-config.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: platform_master
+                tableName: tenants
+      changes:
+        - createTable:
+            schemaName: platform_master
+            tableName: tenants
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: tenant_code
+                  type: VARCHAR(50)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: domain
+                  type: VARCHAR(255)
+                  constraints:
+                    unique: true
+              - column:
+                  name: subdomain
+                  type: VARCHAR(100)
+                  constraints:
+                    unique: true
+              - column:
+                  name: logo_url
+                  type: VARCHAR(500)
+              - column:
+                  name: theme_config
+                  type: JSONB
+              - column:
+                  name: contact_email
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: contact_phone
+                  type: VARCHAR(30)
+              - column:
+                  name: address_line1
+                  type: VARCHAR(300)
+              - column:
+                  name: address_line2
+                  type: VARCHAR(300)
+              - column:
+                  name: city
+                  type: VARCHAR(100)
+              - column:
+                  name: state
+                  type: VARCHAR(100)
+              - column:
+                  name: country_code
+                  type: CHAR(2)
+              - column:
+                  name: postal_code
+                  type: VARCHAR(20)
+              - column:
+                  name: timezone
+                  type: VARCHAR(100)
+                  defaultValue: 'Asia/Kolkata'
+              - column:
+                  name: locale
+                  type: VARCHAR(10)
+                  defaultValue: 'en-IN'
+              - column:
+                  name: currency_code
+                  type: CHAR(3)
+                  defaultValue: 'INR'
+              - column:
+                  name: subscription_plan
+                  type: VARCHAR(50)
+                  defaultValue: 'FREE'
+              - column:
+                  name: subscription_expires_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: max_users
+                  type: INTEGER
+                  defaultValueNumeric: 100
+              - column:
+                  name: current_users
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: features
+                  type: JSONB
+              - column:
+                  name: metadata
+                  type: JSONB
+              - column:
+                  name: onboarded_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - createIndex:
+            indexName: idx_tenants_code_status
+            schemaName: platform_master
+            tableName: tenants
+            columns:
+              - column:
+                  name: tenant_code
+              - column:
+                  name: status
+        - sql:
+            sql: SELECT platform_master.apply_updated_at_trigger('platform_master', 'tenants');
+      rollback:
+        - dropTable:
+            schemaName: platform_master
+            tableName: tenants

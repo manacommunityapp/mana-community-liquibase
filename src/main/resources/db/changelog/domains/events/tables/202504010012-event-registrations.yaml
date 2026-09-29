@@ -1,0 +1,180 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202504010012-event-registrations"
+      author: "mana-community-dev"
+      labels: "events,tables,v1.0"
+      context: "default"
+      comment: "Create event_registrations table"
+      logicalFilePath: "db/changelog/domains/events/tables/202504010012-event-registrations.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: events
+                tableName: event_registrations
+      changes:
+        - createTable:
+            schemaName: events
+            tableName: event_registrations
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_event_registrations
+              - column:
+                  name: event_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: registration_number
+                  type: VARCHAR(100)
+                  constraints:
+                    unique: true
+                    uniqueConstraintName: uq_event_registrations_number
+              - column:
+                  name: registration_type
+                  type: VARCHAR(50)
+                  defaultValue: 'INDIVIDUAL'
+              - column:
+                  name: team_id
+                  type: BIGINT
+              - column:
+                  name: group_size
+                  type: INTEGER
+                  defaultValueNumeric: 1
+              - column:
+                  name: team_name
+                  type: VARCHAR(200)
+              - column:
+                  name: member_user_ids
+                  type: JSONB
+              - column:
+                  name: registration_status
+                  type: VARCHAR(50)
+                  defaultValue: 'PENDING'
+              - column:
+                  name: payment_status
+                  type: VARCHAR(50)
+                  defaultValue: 'PENDING'
+              - column:
+                  name: payment_amount
+                  type: DECIMAL(12,2)
+                  defaultValueNumeric: 0
+              - column:
+                  name: payment_reference
+                  type: VARCHAR(200)
+              - column:
+                  name: payment_gateway
+                  type: VARCHAR(50)
+              - column:
+                  name: payment_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: refund_amount
+                  type: DECIMAL(12,2)
+                  defaultValueNumeric: 0
+              - column:
+                  name: refund_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: refund_reason
+                  type: TEXT
+              - column:
+                  name: check_in_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: check_in_by
+                  type: BIGINT
+              - column:
+                  name: qr_code_url
+                  type: VARCHAR(500)
+              - column:
+                  name: dietary_requirements
+                  type: VARCHAR(500)
+              - column:
+                  name: special_requests
+                  type: TEXT
+              - column:
+                  name: emergency_contact_name
+                  type: VARCHAR(200)
+              - column:
+                  name: emergency_contact_phone
+                  type: VARCHAR(30)
+              - column:
+                  name: t_shirt_size
+                  type: VARCHAR(10)
+              - column:
+                  name: notes
+                  type: TEXT
+              - column:
+                  name: metadata
+                  type: JSONB
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - sql:
+            sql: CREATE UNIQUE INDEX uq_event_reg_event_user ON events.event_registrations(event_id, user_id) WHERE registration_status != 'CANCELLED';
+      rollback:
+        - dropTable:
+            schemaName: events
+            tableName: event_registrations

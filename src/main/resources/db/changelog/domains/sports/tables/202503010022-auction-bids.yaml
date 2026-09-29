@@ -1,0 +1,149 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202503010022-create-auction-bids"
+      author: "mana-community-dev"
+      labels: "sports,table,v1.0"
+      context: "default"
+      comment: "Create auction_bids table"
+      logicalFilePath: "db/changelog/domains/sports/tables/202503010022-auction-bids.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: sports
+                tableName: auction_bids
+      changes:
+        - createTable:
+            schemaName: sports
+            tableName: auction_bids
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_auction_bids
+              - column:
+                  name: auction_config_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: player_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: bidding_team_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tournament_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: bid_amount
+                  type: DECIMAL(14,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: bid_sequence
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: bid_type
+                  type: VARCHAR(50)
+                  defaultValue: 'REGULAR'
+              - column:
+                  name: bid_status
+                  type: VARCHAR(50)
+                  defaultValue: 'ACTIVE'
+              - column:
+                  name: bid_placed_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: bid_placed_by
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_winning_bid
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: sold_to_team_id
+                  type: BIGINT
+              - column:
+                  name: sold_amount
+                  type: DECIMAL(14,2)
+              - column:
+                  name: sold_at
+                  type: TIMESTAMP
+              - column:
+                  name: metadata
+                  type: JSONB
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+      rollback:
+        - dropTable:
+            schemaName: sports
+            tableName: auction_bids

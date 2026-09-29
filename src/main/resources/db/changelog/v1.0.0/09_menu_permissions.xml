@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!-- ════════════════════════════════════════════════════
+         09 — Menu items and granular role permission tables
+         ════════════════════════════════════════════════════ -->
+
+    <changeSet author="community-dev" id="v1.0.0-09-01">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="menu_items"/></not>
+        </preConditions>
+        <createTable tableName="menu_items">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="menu_items_pkey"/>
+            </column>
+            <column name="menu_key" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uq_menu_items_key"/>
+            </column>
+            <column name="label" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="icon" type="VARCHAR(50)"/>
+            <column name="route_path" type="VARCHAR(255)"/>
+            <column name="parent_id" type="BIGINT"/>
+            <column name="sort_order" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="permission_key" type="VARCHAR(100)"/>
+            <column name="community_id" type="BIGINT"/>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE" defaultValueComputed="NOW()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE" defaultValueComputed="NOW()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="menu_items" baseColumnNames="parent_id"
+                                 constraintName="fk_menu_items_parent"
+                                 referencedTableName="menu_items" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableName="menu_items" baseColumnNames="community_id"
+                                 constraintName="fk_menu_items_community"
+                                 referencedTableName="community" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet author="community-dev" id="v1.0.0-09-02">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="menu_role_permission"/></not>
+        </preConditions>
+        <createTable tableName="menu_role_permission">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="menu_role_permission_pkey"/>
+            </column>
+            <column name="role_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="menu_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="can_view" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="can_add" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="can_update" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="can_delete" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE" defaultValueComputed="NOW()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE" defaultValueComputed="NOW()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="menu_role_permission" columnNames="role_id, menu_id"
+                             constraintName="uq_mrp_role_menu"/>
+
+        <addForeignKeyConstraint baseTableName="menu_role_permission" baseColumnNames="role_id"
+                                 constraintName="fk_mrp_role"
+                                 referencedTableName="roles" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableName="menu_role_permission" baseColumnNames="menu_id"
+                                 constraintName="fk_mrp_menu"
+                                 referencedTableName="menu_items" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet author="community-dev" id="v1.0.0-09-03">
+        <createIndex indexName="idx_mrp_role" tableName="menu_role_permission">
+            <column name="role_id"/>
+        </createIndex>
+        <createIndex indexName="idx_mrp_menu" tableName="menu_role_permission">
+            <column name="menu_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="community-dev" id="v1.0.0-09-04">
+        <!-- Seed data for menu_items -->
+        <insert tableName="menu_items">
+            <column name="menu_key" value="income"/>
+            <column name="label" value="Income"/>
+            <column name="sort_order" valueNumeric="10"/>
+        </insert>
+        <insert tableName="menu_items">
+            <column name="menu_key" value="invoices"/>
+            <column name="label" value="Invoices"/>
+            <column name="sort_order" valueNumeric="20"/>
+        </insert>
+        <insert tableName="menu_items">
+            <column name="menu_key" value="receipts"/>
+            <column name="label" value="Receipts"/>
+            <column name="sort_order" valueNumeric="30"/>
+        </insert>
+        <insert tableName="menu_items">
+            <column name="menu_key" value="estimates"/>
+            <column name="label" value="Estimates"/>
+            <column name="sort_order" valueNumeric="40"/>
+        </insert>
+        <insert tableName="menu_items">
+            <column name="menu_key" value="sales_orders"/>
+            <column name="label" value="Sales Orders"/>
+            <column name="sort_order" valueNumeric="50"/>
+        </insert>
+        <insert tableName="menu_items">
+            <column name="menu_key" value="credit_notes"/>
+            <column name="label" value="Credit Notes"/>
+            <column name="sort_order" valueNumeric="60"/>
+        </insert>
+        <insert tableName="menu_items">
+            <column name="menu_key" value="customers"/>
+            <column name="label" value="Customers"/>
+            <column name="sort_order" valueNumeric="70"/>
+        </insert>
+    </changeSet>
+
+    <changeSet author="community-dev" id="v1.0.0-09-05" runOnChange="true">
+        <!-- Seed authorizations for SUPER_ADMIN, ADMIN, MEMBER roles -->
+        <sql>
+            INSERT INTO menu_role_permission (role_id, menu_id, can_view, can_add, can_update, can_delete)
+            SELECT r.id, m.id, true, true, true, true
+            FROM roles r, menu_items m
+            WHERE r.name = 'SUPER_ADMIN'
+              AND m.menu_key IN ('income', 'invoices', 'receipts', 'estimates', 'sales_orders', 'credit_notes', 'customers')
+            ON CONFLICT (role_id, menu_id) DO NOTHING;
+
+            INSERT INTO menu_role_permission (role_id, menu_id, can_view, can_add, can_update, can_delete)
+            SELECT r.id, m.id, true, true, true, false
+            FROM roles r, menu_items m
+            WHERE r.name = 'ADMIN'
+              AND m.menu_key IN ('income', 'invoices', 'receipts', 'estimates', 'sales_orders', 'credit_notes', 'customers')
+            ON CONFLICT (role_id, menu_id) DO NOTHING;
+
+            INSERT INTO menu_role_permission (role_id, menu_id, can_view, can_add, can_update, can_delete)
+            SELECT r.id, m.id, true, false, false, false
+            FROM roles r, menu_items m
+            WHERE r.name = 'MEMBER'
+              AND m.menu_key IN ('income', 'invoices', 'receipts')
+            ON CONFLICT (role_id, menu_id) DO NOTHING;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

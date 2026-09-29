@@ -1,0 +1,165 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202502010019-create-kyc-documents"
+      author: "mana-community-dev"
+      labels: "auth,table,kyc_documents,v1.0"
+      context: "default"
+      comment: "Create kyc documents table"
+      logicalFilePath: "db/changelog/domains/auth/tables/202502010019-kyc-documents.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: auth
+                tableName: kyc_documents
+      changes:
+        - createTable:
+            schemaName: auth
+            tableName: kyc_documents
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_kyc_documents_user
+                    references: auth.users(id)
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: document_type
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: document_number
+                  type: VARCHAR(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: document_number_masked
+                  type: VARCHAR(200)
+              - column:
+                  name: front_image_url
+                  type: VARCHAR(500)
+              - column:
+                  name: back_image_url
+                  type: VARCHAR(500)
+              - column:
+                  name: selfie_image_url
+                  type: VARCHAR(500)
+              - column:
+                  name: issuing_country
+                  type: CHAR(2)
+              - column:
+                  name: issue_date
+                  type: DATE
+              - column:
+                  name: expiry_date
+                  type: DATE
+              - column:
+                  name: kyc_status
+                  type: VARCHAR(50)
+                  defaultValue: 'NOT_SUBMITTED'
+              - column:
+                  name: reviewed_by
+                  type: BIGINT
+              - column:
+                  name: reviewed_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: review_notes
+                  type: TEXT
+              - column:
+                  name: rejection_reason
+                  type: VARCHAR(500)
+              - column:
+                  name: verification_provider
+                  type: VARCHAR(100)
+              - column:
+                  name: verification_reference
+                  type: VARCHAR(200)
+              - column:
+                  name: verification_score
+                  type: DECIMAL(5,2)
+              - column:
+                  name: metadata
+                  type: JSONB
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - createIndex:
+            indexName: idx_kyc_documents_unique
+            schemaName: auth
+            tableName: kyc_documents
+            unique: true
+            columns:
+              - column:
+                  name: user_id
+              - column:
+                  name: document_type
+            where: deleted = FALSE
+      rollback:
+        - dropIndex:
+            indexName: idx_kyc_documents_unique
+            schemaName: auth
+            tableName: kyc_documents
+        - dropTable:
+            schemaName: auth
+            tableName: kyc_documents

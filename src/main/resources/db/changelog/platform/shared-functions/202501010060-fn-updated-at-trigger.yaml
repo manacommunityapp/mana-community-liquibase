@@ -1,0 +1,39 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202501010060-fn-updated-at-trigger"
+      author: "mana-community-dev"
+      labels: "platform,functions,v1.0"
+      context: "default"
+      comment: "Create updated_at trigger function and apply helper"
+      logicalFilePath: "db/changelog/platform/shared-functions/202501010060-fn-updated-at-trigger.yaml"
+      runInTransaction: false
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              CREATE OR REPLACE FUNCTION platform_master.fn_set_updated_at()
+              RETURNS TRIGGER AS $$
+              BEGIN
+                  NEW.updated_at = CURRENT_TIMESTAMP;
+                  RETURN NEW;
+              END;
+              $$ LANGUAGE plpgsql;
+
+              CREATE OR REPLACE FUNCTION platform_master.apply_updated_at_trigger(schema_name TEXT, table_name TEXT)
+              RETURNS void AS $$
+              BEGIN
+                  EXECUTE format('
+                      DROP TRIGGER IF EXISTS trg_set_updated_at ON %I.%I;
+                      CREATE TRIGGER trg_set_updated_at
+                      BEFORE UPDATE ON %I.%I
+                      FOR EACH ROW
+                      EXECUTE FUNCTION platform_master.fn_set_updated_at();
+                  ', schema_name, table_name, schema_name, table_name);
+              END;
+              $$ LANGUAGE plpgsql;
+      rollback:
+        - sql:
+            splitStatements: false
+            sql: |
+              DROP FUNCTION IF EXISTS platform_master.apply_updated_at_trigger(TEXT, TEXT);
+              DROP FUNCTION IF EXISTS platform_master.fn_set_updated_at();

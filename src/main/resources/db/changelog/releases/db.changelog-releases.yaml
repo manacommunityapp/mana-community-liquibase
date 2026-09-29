@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/releases/v1.0/202507290001-v1.0-baseline.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/releases/v1.0/202507290002-v1.0-performance.yaml
+      relativeToChangelogFile: false

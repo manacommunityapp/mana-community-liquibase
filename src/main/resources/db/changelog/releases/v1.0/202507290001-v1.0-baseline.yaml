@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202507290001-v1.0-baseline"
+      author: "mana-community-dev"
+      labels: "release,v1.0"
+      context: "default"
+      comment: "Document v1.0 baseline"
+      logicalFilePath: "db/changelog/releases/v1.0/202507290001-v1.0-baseline.yaml"
+      runInTransaction: false
+      changes:
+        - sql:
+            sql: >
+              INSERT INTO platform_config.system_settings 
+              (tenant_id, category, key, value, value_type, created_by)
+              VALUES (1, 'RELEASE', 'CURRENT_VERSION', '1.0.0', 'STRING', 0)
+              ON CONFLICT (tenant_id, key) DO UPDATE 
+              SET value = '1.0.0', updated_at = CURRENT_TIMESTAMP;
+      rollback:
+        - sql:
+            sql: DELETE FROM platform_config.system_settings WHERE tenant_id = 1 AND category = 'RELEASE' AND key = 'CURRENT_VERSION';

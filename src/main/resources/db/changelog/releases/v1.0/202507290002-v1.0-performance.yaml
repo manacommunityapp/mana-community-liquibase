@@ -1,0 +1,50 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202507290002-v1.0-perf-auth"
+      author: "mana-community-dev"
+      labels: "performance,v1.0"
+      context: "default"
+      comment: "Performance tweaks auth"
+      logicalFilePath: "db/changelog/releases/v1.0/202507290002-v1.0-performance.yaml"
+      runInTransaction: false
+      changes:
+        - sql:
+            splitStatements: false
+            sql: ANALYZE auth.users;
+      rollback:
+        - empty: {}
+
+  - changeSet:
+      id: "202507290002-v1.0-perf-sports"
+      author: "mana-community-dev"
+      labels: "performance,v1.0"
+      context: "default"
+      comment: "Performance tweaks sports"
+      logicalFilePath: "db/changelog/releases/v1.0/202507290002-v1.0-performance.yaml"
+      runInTransaction: false
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              ANALYZE sports.tournaments;
+              ANALYZE sports.tournament_matches;
+              ANALYZE sports.match_standings;
+      rollback:
+        - empty: {}
+
+  - changeSet:
+      id: "202507290002-v1.0-perf-events"
+      author: "mana-community-dev"
+      labels: "performance,v1.0"
+      context: "default"
+      comment: "Performance tweaks events"
+      logicalFilePath: "db/changelog/releases/v1.0/202507290002-v1.0-performance.yaml"
+      runInTransaction: false
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              ANALYZE events.events;
+              ANALYZE events.event_registrations;
+      rollback:
+        - empty: {}

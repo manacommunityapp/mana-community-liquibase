@@ -1,0 +1,143 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202504010013-event-sponsors"
+      author: "mana-community-dev"
+      labels: "events,tables,v1.0"
+      context: "default"
+      comment: "Create event_sponsors table"
+      logicalFilePath: "db/changelog/domains/events/tables/202504010013-event-sponsors.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: events
+                tableName: event_sponsors
+      changes:
+        - createTable:
+            schemaName: events
+            tableName: event_sponsors
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_event_sponsors
+              - column:
+                  name: event_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sponsor_name
+                  type: VARCHAR(300)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sponsor_type
+                  type: VARCHAR(100)
+              - column:
+                  name: logo_url
+                  type: VARCHAR(500)
+              - column:
+                  name: website_url
+                  type: VARCHAR(500)
+              - column:
+                  name: sponsorship_amount
+                  type: DECIMAL(14,2)
+                  defaultValueNumeric: 0
+              - column:
+                  name: currency_code
+                  type: CHAR(3)
+                  defaultValue: 'INR'
+              - column:
+                  name: contribution_type
+                  type: VARCHAR(100)
+              - column:
+                  name: in_kind_description
+                  type: TEXT
+              - column:
+                  name: display_order
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: banner_placement
+                  type: JSONB
+              - column:
+                  name: contact_person_name
+                  type: VARCHAR(200)
+              - column:
+                  name: contact_person_email
+                  type: VARCHAR(255)
+              - column:
+                  name: contact_person_phone
+                  type: VARCHAR(30)
+              - column:
+                  name: agreement_signed
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: agreement_url
+                  type: VARCHAR(500)
+              - column:
+                  name: metadata
+                  type: JSONB
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+      rollback:
+        - dropTable:
+            schemaName: events
+            tableName: event_sponsors

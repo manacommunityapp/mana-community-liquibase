@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202504010001-events-schema"
+      author: "mana-community-dev"
+      labels: "events,schema,v1.0"
+      context: "default"
+      comment: "Create events schema"
+      logicalFilePath: "db/changelog/domains/events/schema/202504010001-events-schema.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - sqlCheck:
+                expectedResult: 1
+                sql: SELECT count(*) FROM information_schema.schemata WHERE schema_name = 'events'
+      changes:
+        - sql:
+            sql: CREATE SCHEMA IF NOT EXISTS events;
+      rollback:
+        - sql:
+            sql: DROP SCHEMA IF EXISTS events CASCADE;

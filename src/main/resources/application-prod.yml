@@ -1,0 +1,29 @@
+# ═══════════════════════════════════════════════════════════
+#  PROD PROFILE — AWS RDS / Production
+#  All values MUST come from AWS Secrets Manager / env vars.
+#  Never hard-code credentials in this file.
+# ═══════════════════════════════════════════════════════════
+spring:
+  datasource:
+    url: jdbc:postgresql://${RDS_ENDPOINT}:5432/manacommunity_db?ssl=true&sslmode=require
+    username: ${DB_USER}
+    password: ${DB_PASS}
+    hikari:
+      maximum-pool-size: 3
+      minimum-idle: 1
+      connection-timeout: 60000
+
+  liquibase:
+    contexts: default,prod
+    enabled: true
+    # IMPORTANT: Never run drop-first in prod!
+    drop-first: false
+
+server:
+  port: ${SERVER_PORT:8090}
+
+logging:
+  level:
+    liquibase: WARN
+    com.manacommunity: WARN
+    org.springframework: WARN

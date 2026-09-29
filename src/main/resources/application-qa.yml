@@ -1,0 +1,17 @@
+# ═══════════════════════════════════════════════════════════
+#  QA PROFILE — Quality Assurance / Test environment
+# ═══════════════════════════════════════════════════════════
+spring:
+  datasource:
+    url: ${QA_DB_URL:jdbc:postgresql://qa-db:5432/manacommunity_db}
+    username: ${QA_DB_USER:manacommunity}
+    password: ${QA_DB_PASS:changeme}
+
+  liquibase:
+    contexts: default,qa
+    enabled: true
+
+logging:
+  level:
+    liquibase: INFO
+    com.manacommunity: INFO
