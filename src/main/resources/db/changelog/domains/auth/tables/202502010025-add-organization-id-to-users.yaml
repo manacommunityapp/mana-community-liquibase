@@ -1,0 +1,59 @@
+﻿databaseChangeLog:
+  - changeSet:
+      id: "202502010025-add-organization-id-to-users"
+      author: "mana-community-dev"
+      labels: "auth,schema,users,tenancy,v1.0"
+      context: "default"
+      comment: "Add organization_id column, foreign key and index to auth.users"
+      logicalFilePath: "db/changelog/domains/auth/tables/202502010025-add-organization-id-to-users.yaml"
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          and:
+            - tableExists:
+                schemaName: auth
+                tableName: users
+            - not:
+                - columnExists:
+                    schemaName: auth
+                    tableName: users
+                    columnName: organization_id
+      changes:
+        - addColumn:
+            schemaName: auth
+            tableName: users
+            columns:
+              - column:
+                  name: organization_id
+                  type: BIGINT
+                  defaultValueNumeric: 1
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableSchemaName: auth
+            baseTableName: users
+            baseColumnNames: organization_id
+            referencedTableSchemaName: platform_master
+            referencedTableName: organizations
+            referencedColumnNames: id
+            constraintName: fk_users_organization
+        - createIndex:
+            indexName: idx_users_organization_id
+            schemaName: auth
+            tableName: users
+            columns:
+              - column:
+                  name: organization_id
+      rollback:
+        - dropForeignKeyConstraint:
+            baseTableSchemaName: auth
+            baseTableName: users
+            constraintName: fk_users_organization
+        - dropIndex:
+            schemaName: auth
+            tableName: users
+            indexName: idx_users_organization_id
+        - dropColumn:
+            schemaName: auth
+            tableName: users
+            columnName: organization_id

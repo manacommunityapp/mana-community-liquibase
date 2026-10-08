@@ -19,7 +19,15 @@ databaseChangeLog:
       relativeToChangelogFile: false
 
   - include:
+      file: db/changelog/platform/master-data/202501010049-organizations.yaml
+      relativeToChangelogFile: false
+
+  - include:
       file: db/changelog/platform/configuration/202501010050-tenant-config.yaml
+      relativeToChangelogFile: false
+
+  - include:
+      file: db/changelog/platform/configuration/202501010055-add-organization-id-to-tenants.yaml
       relativeToChangelogFile: false
 
   - include:

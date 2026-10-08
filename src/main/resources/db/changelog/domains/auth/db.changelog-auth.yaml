@@ -33,6 +33,9 @@ databaseChangeLog:
       file: db/changelog/domains/auth/tables/202502010019-kyc-documents.yaml
       relativeToChangelogFile: false
   - include:
+      file: db/changelog/domains/auth/tables/202502010025-add-organization-id-to-users.yaml
+      relativeToChangelogFile: false
+  - include:
       file: db/changelog/domains/auth/indexes/202502010030-auth-indexes.yaml
       relativeToChangelogFile: false
   - include:

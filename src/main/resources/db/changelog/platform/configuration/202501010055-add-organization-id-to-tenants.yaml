@@ -1,0 +1,59 @@
+﻿databaseChangeLog:
+  - changeSet:
+      id: "202501010055-add-organization-id-to-tenants"
+      author: "mana-community-dev"
+      labels: "platform,schema,tenants,tenancy,v1.0"
+      context: "default"
+      comment: "Add organization_id column, foreign key and index to platform_master.tenants"
+      logicalFilePath: "db/changelog/platform/configuration/202501010055-add-organization-id-to-tenants.yaml"
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          and:
+            - tableExists:
+                schemaName: platform_master
+                tableName: tenants
+            - not:
+                - columnExists:
+                    schemaName: platform_master
+                    tableName: tenants
+                    columnName: organization_id
+      changes:
+        - addColumn:
+            schemaName: platform_master
+            tableName: tenants
+            columns:
+              - column:
+                  name: organization_id
+                  type: BIGINT
+                  defaultValueNumeric: 1
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableSchemaName: platform_master
+            baseTableName: tenants
+            baseColumnNames: organization_id
+            referencedTableSchemaName: platform_master
+            referencedTableName: organizations
+            referencedColumnNames: id
+            constraintName: fk_tenants_organization
+        - createIndex:
+            indexName: idx_tenants_organization_id
+            schemaName: platform_master
+            tableName: tenants
+            columns:
+              - column:
+                  name: organization_id
+      rollback:
+        - dropForeignKeyConstraint:
+            baseTableSchemaName: platform_master
+            baseTableName: tenants
+            constraintName: fk_tenants_organization
+        - dropIndex:
+            schemaName: platform_master
+            tableName: tenants
+            indexName: idx_tenants_organization_id
+        - dropColumn:
+            schemaName: platform_master
+            tableName: tenants
+            columnName: organization_id
