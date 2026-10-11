@@ -1,0 +1,137 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202503010021-create-auction-teams"
+      author: "mana-community-dev"
+      labels: "sports,table,v1.0"
+      context: "default"
+      comment: "Create auction_teams table"
+      logicalFilePath: "db/changelog/domains/sports/tables/202503010021-auction-teams.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: sports
+                tableName: auction_teams
+      changes:
+        - createTable:
+            schemaName: sports
+            tableName: auction_teams
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_auction_teams
+              - column:
+                  name: auction_config_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: team_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tournament_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: total_purse
+                  type: DECIMAL(14,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: spent_amount
+                  type: DECIMAL(14,2)
+                  defaultValueNumeric: 0
+              - column:
+                  name: remaining_purse
+                  type: DECIMAL(14,2)
+              - column:
+                  name: players_bought
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: max_bid_capacity
+                  type: DECIMAL(14,2)
+              - column:
+                  name: rtm_used
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: team_composition
+                  type: JSONB
+              - column:
+                  name: is_complete
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: metadata
+                  type: JSONB
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            schemaName: sports
+            tableName: auction_teams
+            columnNames: auction_config_id, team_id
+            constraintName: uk_auction_teams_config_team
+      rollback:
+        - dropTable:
+            schemaName: sports
+            tableName: auction_teams

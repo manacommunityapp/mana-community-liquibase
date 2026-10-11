@@ -1,80 +1,59 @@
-# ─────────────────────────────────────────────────────
-#  Mana Community — Liquibase Migration Runner
-#  Spring Boot 3.x  |  Liquibase auto-run on startup
-# ─────────────────────────────────────────────────────
-
+# ═══════════════════════════════════════════════════════════
+#  Mana Community — Enterprise Liquibase Migration Service
+#  Base application configuration
+# ═══════════════════════════════════════════════════════════
 spring:
   application:
     name: mana-community-liquibase
 
-  # ── DataSource (PostgreSQL) ──────────────────────────
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:postgres}?currentSchema=${DB_SCHEMA:manacommunity}
-    username: ${DB_USER:postgres}
-    password: ${DB_PASS:changeme}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/manacommunity_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:changeme}
     driver-class-name: org.postgresql.Driver
     hikari:
+      pool-name: ManaLiquibasePool
       maximum-pool-size: 5
-      minimum-idle: 1
+      minimum-idle: 2
       connection-timeout: 30000
       idle-timeout: 600000
+      max-lifetime: 1800000
+      connection-test-query: SELECT 1
 
-  # ── JPA ─────────────────────────────────────────────
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: false
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
-        jdbc:
-          time_zone: UTC
-
-  # ── Liquibase ────────────────────────────────────────
   liquibase:
     enabled: true
-    change-log: classpath:db/changelog/db.changelog-master.xml
-    default-schema: ${DB_SCHEMA:manacommunity}
+    change-log: classpath:db/changelog/db.changelog-root.yaml
+    default-schema: platform_master
+    liquibase-schema: liquibase_meta
+    database-change-log-table: DATABASE_CHANGE_LOG
+    database-change-log-lock-table: DATABASE_CHANGE_LOG_LOCK
     contexts: ${LIQUIBASE_CONTEXTS:default}
+    labels: ${LIQUIBASE_LABELS:}
     drop-first: false
+    test-rollback-on-update: false
 
-# ── Server ──────────────────────────────────────────────
-server:
-  port: ${PORT:8080}
-  servlet:
-    context-path: /
-
----
-# ─────────────────────────────────────────────────────
-# PROFILE: local  (developer machine)
-# ─────────────────────────────────────────────────────
-spring:
-  config:
-    activate:
-      on-profile: local
-  datasource:
-    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=manacommunity
-    username: postgres
-    password: changeme
-  liquibase:
-    default-schema: manacommunity
-    contexts: default,local
-
----
-# ─────────────────────────────────────────────────────
-# PROFILE: prod  (AWS EC2 + RDS)
-# ─────────────────────────────────────────────────────
-spring:
-  config:
-    activate:
-      on-profile: prod
-  datasource:
-    url: jdbc:postgresql://${RDS_ENDPOINT}:5432/${DB_NAME}?currentSchema=${DB_SCHEMA}
-    username: ${DB_USER}
-    password: ${DB_PASS}
   jpa:
     show-sql: false
-  liquibase:
-    default-schema: ${DB_SCHEMA}
-    contexts: default
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+
+server:
+  port: ${SERVER_PORT:8090}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,liquibase
+  endpoint:
+    health:
+      show-details: always
+    liquibase:
+      enabled: true
+
+logging:
+  level:
+    liquibase: INFO
+    com.manacommunity: DEBUG
+    org.springframework.boot: WARN

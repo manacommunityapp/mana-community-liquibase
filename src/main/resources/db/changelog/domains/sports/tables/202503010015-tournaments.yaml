@@ -1,0 +1,209 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202503010015-create-tournaments"
+      author: "mana-community-dev"
+      labels: "sports,table,v1.0"
+      context: "default"
+      comment: "Create tournaments table"
+      logicalFilePath: "db/changelog/domains/sports/tables/202503010015-tournaments.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: sports
+                tableName: tournaments
+      changes:
+        - createTable:
+            schemaName: sports
+            tableName: tournaments
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_tournaments
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sports_meta_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(300)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: short_name
+                  type: VARCHAR(100)
+              - column:
+                  name: edition
+                  type: VARCHAR(50)
+              - column:
+                  name: tournament_code
+                  type: VARCHAR(50)
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: banner_url
+                  type: VARCHAR(500)
+              - column:
+                  name: logo_url
+                  type: VARCHAR(500)
+              - column:
+                  name: format
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tournament_type
+                  type: VARCHAR(50)
+              - column:
+                  name: venue_id
+                  type: BIGINT
+              - column:
+                  name: organizer_user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: start_date
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: end_date
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: registration_open_date
+                  type: DATE
+              - column:
+                  name: registration_close_date
+                  type: DATE
+              - column:
+                  name: max_teams
+                  type: INTEGER
+              - column:
+                  name: max_players_per_team
+                  type: INTEGER
+              - column:
+                  name: min_players_per_team
+                  type: INTEGER
+              - column:
+                  name: entry_fee
+                  type: DECIMAL(12,2)
+                  defaultValueNumeric: 0
+              - column:
+                  name: prize_pool
+                  type: DECIMAL(14,2)
+                  defaultValueNumeric: 0
+              - column:
+                  name: prize_distribution
+                  type: JSONB
+              - column:
+                  name: rules_document_url
+                  type: VARCHAR(500)
+              - column:
+                  name: live_stream_url
+                  type: VARCHAR(500)
+              - column:
+                  name: has_auction
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: auction_date
+                  type: DATE
+              - column:
+                  name: group_count
+                  type: INTEGER
+                  defaultValueNumeric: 1
+              - column:
+                  name: teams_per_group
+                  type: INTEGER
+              - column:
+                  name: knockout_rounds
+                  type: INTEGER
+              - column:
+                  name: current_round
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: tournament_status
+                  type: VARCHAR(50)
+                  defaultValue: 'DRAFT'
+              - column:
+                  name: winner_team_id
+                  type: BIGINT
+              - column:
+                  name: runner_up_team_id
+                  type: BIGINT
+              - column:
+                  name: metadata
+                  type: JSONB
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            schemaName: sports
+            tableName: tournaments
+            columnNames: tenant_id, tournament_code
+            constraintName: uk_tournaments_tenant_code
+      rollback:
+        - dropTable:
+            schemaName: sports
+            tableName: tournaments

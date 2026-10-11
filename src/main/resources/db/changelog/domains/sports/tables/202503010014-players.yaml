@@ -1,0 +1,156 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202503010014-create-players"
+      author: "mana-community-dev"
+      labels: "sports,table,v1.0"
+      context: "default"
+      comment: "Create players table"
+      logicalFilePath: "db/changelog/domains/sports/tables/202503010014-players.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: sports
+                tableName: players
+      changes:
+        - createTable:
+            schemaName: sports
+            tableName: players
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_players
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: team_id
+                  type: BIGINT
+              - column:
+                  name: sports_meta_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: jersey_number
+                  type: INTEGER
+              - column:
+                  name: position
+                  type: VARCHAR(100)
+              - column:
+                  name: player_type
+                  type: VARCHAR(50)
+                  defaultValue: 'REGISTERED'
+              - column:
+                  name: skill_level
+                  type: VARCHAR(50)
+              - column:
+                  name: skill_rating
+                  type: DECIMAL(5,2)
+                  defaultValueNumeric: 500.00
+              - column:
+                  name: batting_style
+                  type: VARCHAR(50)
+              - column:
+                  name: bowling_style
+                  type: VARCHAR(50)
+              - column:
+                  name: dominant_hand
+                  type: VARCHAR(10)
+              - column:
+                  name: is_overseas
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: auction_base_price
+                  type: DECIMAL(12,2)
+                  defaultValueNumeric: 0
+              - column:
+                  name: auction_sold_price
+                  type: DECIMAL(12,2)
+              - column:
+                  name: is_available_for_auction
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+              - column:
+                  name: registration_fee_paid
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: fee_transaction_ref
+                  type: VARCHAR(200)
+              - column:
+                  name: stats
+                  type: JSONB
+              - column:
+                  name: achievements
+                  type: JSONB
+              - column:
+                  name: metadata
+                  type: JSONB
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - sql:
+            sql: CREATE UNIQUE INDEX uk_players_user_sport ON sports.players(user_id, sports_meta_id, tenant_id) WHERE deleted = FALSE;
+      rollback:
+        - dropTable:
+            schemaName: sports
+            tableName: players

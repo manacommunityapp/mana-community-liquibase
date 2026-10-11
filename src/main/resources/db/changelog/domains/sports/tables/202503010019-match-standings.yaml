@@ -1,0 +1,171 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202503010019-create-match-standings"
+      author: "mana-community-dev"
+      labels: "sports,table,v1.0"
+      context: "default"
+      comment: "Create match_standings table"
+      logicalFilePath: "db/changelog/domains/sports/tables/202503010019-match-standings.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: sports
+                tableName: match_standings
+      changes:
+        - createTable:
+            schemaName: sports
+            tableName: match_standings
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_match_standings
+              - column:
+                  name: tournament_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: group_id
+                  type: BIGINT
+              - column:
+                  name: team_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: matches_played
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: matches_won
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: matches_lost
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: matches_drawn
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: matches_no_result
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: points
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: net_run_rate
+                  type: DECIMAL(8,4)
+                  defaultValueNumeric: 0
+              - column:
+                  name: runs_scored
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: runs_conceded
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: wickets_taken
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: wickets_lost
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: overs_faced
+                  type: DECIMAL(8,2)
+                  defaultValueNumeric: 0
+              - column:
+                  name: overs_bowled
+                  type: DECIMAL(8,2)
+                  defaultValueNumeric: 0
+              - column:
+                  name: position
+                  type: INTEGER
+              - column:
+                  name: is_qualified
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: is_eliminated
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: qualification_note
+                  type: VARCHAR(200)
+              - column:
+                  name: custom_stats
+                  type: JSONB
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            schemaName: sports
+            tableName: match_standings
+            columnNames: tournament_id, team_id
+            constraintName: uk_match_standings_tourn_team
+      rollback:
+        - dropTable:
+            schemaName: sports
+            tableName: match_standings

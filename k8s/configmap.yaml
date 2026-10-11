@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: liquibase-config
+  namespace: manacommunity-db-migration
+data:
+  SPRING_PROFILES_ACTIVE: "prod"
+  LIQUIBASE_CONTEXTS: "default,prod"
+  DB_URL: "jdbc:postgresql://$(RDS_ENDPOINT):5432/manacommunity_db?ssl=true&sslmode=require"
+  SERVER_PORT: "8090"

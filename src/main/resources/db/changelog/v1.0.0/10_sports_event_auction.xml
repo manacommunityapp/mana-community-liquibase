@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!-- ════════════════════════════════════════════════════
+         10 — Add auction boolean column to sports_event
+         ════════════════════════════════════════════════════ -->
+
+    <changeSet author="community-dev" id="v1.0.0-10-01">
+        <preConditions onFail="MARK_RAN">
+            <not><columnExists tableName="sports_event" columnName="auction"/></not>
+        </preConditions>
+        <addColumn tableName="sports_event">
+            <column name="auction" type="BOOLEAN" defaultValueBoolean="false"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

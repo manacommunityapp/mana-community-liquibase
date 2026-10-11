@@ -1,0 +1,142 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202504010015-event-notifications"
+      author: "mana-community-dev"
+      labels: "events,tables,v1.0"
+      context: "default"
+      comment: "Create event_notifications table"
+      logicalFilePath: "db/changelog/domains/events/tables/202504010015-event-notifications.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: events
+                tableName: event_notifications
+      changes:
+        - createTable:
+            schemaName: events
+            tableName: event_notifications
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_event_notifications
+              - column:
+                  name: event_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: notification_type
+                  type: VARCHAR(100)
+              - column:
+                  name: trigger_type
+                  type: VARCHAR(50)
+              - column:
+                  name: trigger_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: trigger_offset_hours
+                  type: INTEGER
+              - column:
+                  name: channels
+                  type: JSONB
+              - column:
+                  name: target_audience
+                  type: VARCHAR(100)
+                  defaultValue: 'ALL_REGISTERED'
+              - column:
+                  name: template_code
+                  type: VARCHAR(200)
+              - column:
+                  name: subject
+                  type: VARCHAR(500)
+              - column:
+                  name: message_body
+                  type: TEXT
+              - column:
+                  name: custom_data
+                  type: JSONB
+              - column:
+                  name: is_sent
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: sent_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: recipient_count
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: success_count
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: failure_count
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: metadata
+                  type: JSONB
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+      rollback:
+        - dropTable:
+            schemaName: events
+            tableName: event_notifications

@@ -1,0 +1,154 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202502010013-create-user-sessions"
+      author: "mana-community-dev"
+      labels: "auth,table,user_sessions,v1.0"
+      context: "default"
+      comment: "Create user sessions table"
+      logicalFilePath: "db/changelog/domains/auth/tables/202502010013-user-sessions.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: auth
+                tableName: user_sessions
+      changes:
+        - createTable:
+            schemaName: auth
+            tableName: user_sessions
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: session_token
+                  type: VARCHAR(500)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_user_sessions_user
+                    references: auth.users(id)
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: device_id
+                  type: BIGINT
+              - column:
+                  name: ip_address
+                  type: VARCHAR(45)
+              - column:
+                  name: user_agent
+                  type: TEXT
+              - column:
+                  name: device_type
+                  type: VARCHAR(50)
+              - column:
+                  name: os
+                  type: VARCHAR(100)
+              - column:
+                  name: os_version
+                  type: VARCHAR(50)
+              - column:
+                  name: browser
+                  type: VARCHAR(100)
+              - column:
+                  name: browser_version
+                  type: VARCHAR(50)
+              - column:
+                  name: app_version
+                  type: VARCHAR(50)
+              - column:
+                  name: location_city
+                  type: VARCHAR(100)
+              - column:
+                  name: location_country
+                  type: CHAR(2)
+              - column:
+                  name: latitude
+                  type: DECIMAL(9,6)
+              - column:
+                  name: longitude
+                  type: DECIMAL(9,6)
+              - column:
+                  name: is_active
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+              - column:
+                  name: last_accessed_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: expires_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: invalidated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: invalidation_reason
+                  type: VARCHAR(100)
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+      rollback:
+        - dropTable:
+            schemaName: auth
+            tableName: user_sessions

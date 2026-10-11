@@ -1,0 +1,143 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202502010016-create-otp-verifications"
+      author: "mana-community-dev"
+      labels: "auth,table,otp_verifications,v1.0"
+      context: "default"
+      comment: "Create otp verifications table"
+      logicalFilePath: "db/changelog/domains/auth/tables/202502010016-otp-verifications.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: auth
+                tableName: otp_verifications
+      changes:
+        - createTable:
+            schemaName: auth
+            tableName: otp_verifications
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: purpose
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: channel
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: recipient
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: otp_hash
+                  type: VARCHAR(500)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: attempt_count
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: max_attempts
+                  type: INTEGER
+                  defaultValueNumeric: 5
+              - column:
+                  name: is_verified
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: verified_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: expires_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sent_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: resend_count
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: last_resent_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: ip_address
+                  type: VARCHAR(45)
+              - column:
+                  name: metadata
+                  type: JSONB
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+      rollback:
+        - dropTable:
+            schemaName: auth
+            tableName: otp_verifications

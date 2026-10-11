@@ -1,0 +1,159 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202503010020-create-auction-config"
+      author: "mana-community-dev"
+      labels: "sports,table,v1.0"
+      context: "default"
+      comment: "Create auction_config table"
+      logicalFilePath: "db/changelog/domains/sports/tables/202503010020-auction-config.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: sports
+                tableName: auction_config
+      changes:
+        - createTable:
+            schemaName: sports
+            tableName: auction_config
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_auction_config
+              - column:
+                  name: tournament_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uk_auction_config_tournament
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: auction_type
+                  type: VARCHAR(50)
+                  defaultValue: 'LIVE'
+              - column:
+                  name: auction_date
+                  type: TIMESTAMP
+              - column:
+                  name: auction_venue_id
+                  type: BIGINT
+              - column:
+                  name: total_purse_per_team
+                  type: DECIMAL(14,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: purse_currency
+                  type: CHAR(3)
+                  defaultValue: 'INR'
+              - column:
+                  name: min_bid_increment
+                  type: DECIMAL(10,2)
+                  defaultValueNumeric: 100000
+              - column:
+                  name: max_players_per_team
+                  type: INTEGER
+              - column:
+                  name: min_players_per_team
+                  type: INTEGER
+              - column:
+                  name: max_overseas_players
+                  type: INTEGER
+                  defaultValueNumeric: 4
+              - column:
+                  name: must_buy_categories
+                  type: JSONB
+              - column:
+                  name: base_price_tiers
+                  type: JSONB
+              - column:
+                  name: bidding_time_seconds
+                  type: INTEGER
+                  defaultValueNumeric: 30
+              - column:
+                  name: extension_time_seconds
+                  type: INTEGER
+                  defaultValueNumeric: 10
+              - column:
+                  name: rtm_allowed
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+              - column:
+                  name: rtm_count_per_team
+                  type: INTEGER
+                  defaultValueNumeric: 2
+              - column:
+                  name: auction_rules
+                  type: TEXT
+              - column:
+                  name: auction_status
+                  type: VARCHAR(50)
+                  defaultValue: 'PENDING'
+              - column:
+                  name: auctioneer_user_id
+                  type: BIGINT
+              - column:
+                  name: metadata
+                  type: JSONB
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+      rollback:
+        - dropTable:
+            schemaName: sports
+            tableName: auction_config

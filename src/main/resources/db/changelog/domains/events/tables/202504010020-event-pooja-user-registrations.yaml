@@ -1,0 +1,127 @@
+databaseChangeLog:
+  - changeSet:
+      id: 202504010020-event-pooja-user-registrations
+      author: mana-community-dev
+      labels: events,tables,pooja,v1.0
+      context: default
+      comment: Create event_pooja_user_registrations table for devotee pooja & seva registrations
+      logicalFilePath: db/changelog/domains/events/tables/202504010020-event-pooja-user-registrations.yaml
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                tableName: event_pooja_user_registrations
+      changes:
+        - createTable:
+            tableName: event_pooja_user_registrations
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_event_pooja_user_registrations
+              - column:
+                  name: reg_code
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uq_event_pooja_user_reg_code
+              - column:
+                  name: event_id
+                  type: BIGINT
+              - column:
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  name: community_id
+                  type: BIGINT
+              - column:
+                  name: participant_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: gotram
+                  type: VARCHAR(100)
+              - column:
+                  name: phone
+                  type: VARCHAR(50)
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  name: flat_no
+                  type: VARCHAR(100)
+              - column:
+                  name: devotee_count
+                  type: INTEGER
+                  defaultValueNumeric: 1
+              - column:
+                  name: attending_devotees
+                  type: TEXT
+              - column:
+                  name: pooja_slot_name
+                  type: VARCHAR(255)
+              - column:
+                  name: pooja_slot_date
+                  type: VARCHAR(50)
+              - column:
+                  name: pooja_slot_time
+                  type: VARCHAR(100)
+              - column:
+                  name: venue
+                  type: VARCHAR(255)
+              - column:
+                  name: mandap
+                  type: VARCHAR(255)
+              - column:
+                  name: pandit_name
+                  type: VARCHAR(255)
+              - column:
+                  name: category
+                  type: VARCHAR(100)
+                  defaultValue: 'Pooja'
+              - column:
+                  name: booking_fee
+                  type: DECIMAL(10,2)
+                  defaultValueNumeric: 0.00
+              - column:
+                  name: payment_status
+                  type: VARCHAR(50)
+                  defaultValue: 'FREE'
+              - column:
+                  name: payment_method
+                  type: VARCHAR(100)
+                  defaultValue: 'Free Seva'
+              - column:
+                  name: transaction_id
+                  type: VARCHAR(255)
+              - column:
+                  name: payment_receipt_url
+                  type: TEXT
+              - column:
+                  name: prasadam_mode
+                  type: VARCHAR(50)
+                  defaultValue: 'mandap'
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  defaultValue: 'CONFIRMED'
+              - column:
+                  name: qr_code_url
+                  type: TEXT
+              - column:
+                  name: notes
+                  type: TEXT
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP

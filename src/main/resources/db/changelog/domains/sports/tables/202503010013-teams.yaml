@@ -1,0 +1,172 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202503010013-create-teams"
+      author: "mana-community-dev"
+      labels: "sports,table,v1.0"
+      context: "default"
+      comment: "Create teams table"
+      logicalFilePath: "db/changelog/domains/sports/tables/202503010013-teams.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: sports
+                tableName: teams
+      changes:
+        - createTable:
+            schemaName: sports
+            tableName: teams
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_teams
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sports_meta_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: short_name
+                  type: VARCHAR(50)
+              - column:
+                  name: team_code
+                  type: VARCHAR(20)
+              - column:
+                  name: logo_url
+                  type: VARCHAR(500)
+              - column:
+                  name: jersey_primary_color
+                  type: VARCHAR(7)
+              - column:
+                  name: jersey_secondary_color
+                  type: VARCHAR(7)
+              - column:
+                  name: home_venue_id
+                  type: BIGINT
+              - column:
+                  name: captain_user_id
+                  type: BIGINT
+              - column:
+                  name: vice_captain_user_id
+                  type: BIGINT
+              - column:
+                  name: manager_user_id
+                  type: BIGINT
+              - column:
+                  name: coach_user_id
+                  type: BIGINT
+              - column:
+                  name: founded_year
+                  type: INTEGER
+              - column:
+                  name: city
+                  type: VARCHAR(100)
+              - column:
+                  name: country_code
+                  type: CHAR(2)
+              - column:
+                  name: total_wins
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: total_losses
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: total_draws
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: total_points
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: rating
+                  type: DECIMAL(4,2)
+                  defaultValueNumeric: 5.00
+              - column:
+                  name: is_private
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: join_code
+                  type: VARCHAR(20)
+              - column:
+                  name: max_players
+                  type: INTEGER
+                  defaultValueNumeric: 15
+              - column:
+                  name: metadata
+                  type: JSONB
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            schemaName: sports
+            tableName: teams
+            columnNames: tenant_id, team_code
+            constraintName: uk_teams_tenant_code
+      rollback:
+        - dropTable:
+            schemaName: sports
+            tableName: teams

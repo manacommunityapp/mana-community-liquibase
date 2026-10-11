@@ -1,0 +1,99 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202502010018-create-login-attempts"
+      author: "mana-community-dev"
+      labels: "auth,table,login_attempts,v1.0"
+      context: "default"
+      comment: "Create login attempts table"
+      logicalFilePath: "db/changelog/domains/auth/tables/202502010018-login-attempts.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: auth
+                tableName: login_attempts
+      changes:
+        - createTable:
+            schemaName: auth
+            tableName: login_attempts
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: identifier
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: identifier_type
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  name: attempt_type
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ip_address
+                  type: VARCHAR(45)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_agent
+                  type: TEXT
+              - column:
+                  name: device_fingerprint
+                  type: VARCHAR(500)
+              - column:
+                  name: location_country
+                  type: CHAR(2)
+              - column:
+                  name: location_city
+                  type: VARCHAR(100)
+              - column:
+                  name: risk_score
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: is_suspicious
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: attempted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: metadata
+                  type: JSONB
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+      rollback:
+        - dropTable:
+            schemaName: auth
+            tableName: login_attempts

@@ -1,0 +1,138 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202503010016-create-tournament-config"
+      author: "mana-community-dev"
+      labels: "sports,table,v1.0"
+      context: "default"
+      comment: "Create tournament_config table"
+      logicalFilePath: "db/changelog/domains/sports/tables/202503010016-tournament-config.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: sports
+                tableName: tournament_config
+      changes:
+        - createTable:
+            schemaName: sports
+            tableName: tournament_config
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_tournament_config
+              - column:
+                  name: tournament_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uk_tournament_config_tournament
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: points_for_win
+                  type: INTEGER
+                  defaultValueNumeric: 3
+              - column:
+                  name: points_for_draw
+                  type: INTEGER
+                  defaultValueNumeric: 1
+              - column:
+                  name: points_for_loss
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: points_for_no_result
+                  type: INTEGER
+                  defaultValueNumeric: 1
+              - column:
+                  name: tiebreaker_criteria
+                  type: JSONB
+              - column:
+                  name: over_limit
+                  type: INTEGER
+              - column:
+                  name: powerplay_overs
+                  type: INTEGER
+              - column:
+                  name: dls_enabled
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: super_over_enabled
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: third_umpire_enabled
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: drs_per_team
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: custom_rules
+                  type: JSONB
+              - column:
+                  name: broadcast_config
+                  type: JSONB
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+      rollback:
+        - dropTable:
+            schemaName: sports
+            tableName: tournament_config

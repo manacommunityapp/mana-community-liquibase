@@ -1,0 +1,64 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202501010001-create-schemas"
+      author: "mana-community-dev"
+      labels: "platform,schema,v1.0"
+      context: "default"
+      comment: "Create all PostgreSQL schemas"
+      logicalFilePath: "db/changelog/platform/schema/202501010001-create-schemas.yaml"
+      runInTransaction: false
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              CREATE SCHEMA IF NOT EXISTS platform_master;
+              COMMENT ON SCHEMA platform_master IS 'Shared master data';
+              
+              CREATE SCHEMA IF NOT EXISTS platform_audit;
+              COMMENT ON SCHEMA platform_audit IS 'Enterprise audit log';
+              
+              CREATE SCHEMA IF NOT EXISTS platform_config;
+              COMMENT ON SCHEMA platform_config IS 'System settings and feature flags';
+              
+              CREATE SCHEMA IF NOT EXISTS platform_notification;
+              COMMENT ON SCHEMA platform_notification IS 'Notification templates';
+              
+              CREATE SCHEMA IF NOT EXISTS platform_workflow;
+              COMMENT ON SCHEMA platform_workflow IS 'Workflow definitions';
+              
+              CREATE SCHEMA IF NOT EXISTS platform_document;
+              COMMENT ON SCHEMA platform_document IS 'Document management';
+              
+              CREATE SCHEMA IF NOT EXISTS platform_ai;
+              COMMENT ON SCHEMA platform_ai IS 'AI capabilities';
+              
+              CREATE SCHEMA IF NOT EXISTS platform_analytics;
+              COMMENT ON SCHEMA platform_analytics IS 'Analytics capabilities';
+              
+              CREATE SCHEMA IF NOT EXISTS liquibase_meta;
+              COMMENT ON SCHEMA liquibase_meta IS 'Liquibase metadata';
+              
+              CREATE SCHEMA IF NOT EXISTS auth;
+              COMMENT ON SCHEMA auth IS 'Authentication domain';
+              
+              CREATE SCHEMA IF NOT EXISTS sports;
+              COMMENT ON SCHEMA sports IS 'Sports domain';
+              
+              CREATE SCHEMA IF NOT EXISTS events;
+              COMMENT ON SCHEMA events IS 'Events domain';
+      rollback:
+        - sql:
+            splitStatements: false
+            sql: |
+              DROP SCHEMA IF EXISTS platform_master CASCADE;
+              DROP SCHEMA IF EXISTS platform_audit CASCADE;
+              DROP SCHEMA IF EXISTS platform_config CASCADE;
+              DROP SCHEMA IF EXISTS platform_notification CASCADE;
+              DROP SCHEMA IF EXISTS platform_workflow CASCADE;
+              DROP SCHEMA IF EXISTS platform_document CASCADE;
+              DROP SCHEMA IF EXISTS platform_ai CASCADE;
+              DROP SCHEMA IF EXISTS platform_analytics CASCADE;
+              DROP SCHEMA IF EXISTS liquibase_meta CASCADE;
+              DROP SCHEMA IF EXISTS auth CASCADE;
+              DROP SCHEMA IF EXISTS sports CASCADE;
+              DROP SCHEMA IF EXISTS events CASCADE;

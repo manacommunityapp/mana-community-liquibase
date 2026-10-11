@@ -1,0 +1,17 @@
+# ═══════════════════════════════════════════════════════════
+#  DEV PROFILE — Development server
+# ═══════════════════════════════════════════════════════════
+spring:
+  datasource:
+    url: ${DEV_DB_URL:jdbc:postgresql://dev-db:5432/manacommunity_db}
+    username: ${DEV_DB_USER:manacommunity}
+    password: ${DEV_DB_PASS:changeme}
+
+  liquibase:
+    contexts: default,dev
+    enabled: true
+
+logging:
+  level:
+    liquibase: INFO
+    com.manacommunity: DEBUG

@@ -1,0 +1,159 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202501010020-sports-categories"
+      author: "mana-community-dev"
+      labels: "platform,schema,v1.0"
+      context: "default"
+      comment: "Create sports categories table"
+      logicalFilePath: "db/changelog/platform/master-data/202501010020-sports-categories.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: platform_master
+                tableName: sports_categories
+      changes:
+        - createTable:
+            schemaName: platform_master
+            tableName: sports_categories
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: code
+                  type: VARCHAR(50)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: icon_url
+                  type: VARCHAR(500)
+              - column:
+                  name: min_players_per_team
+                  type: INTEGER
+              - column:
+                  name: max_players_per_team
+                  type: INTEGER
+              - column:
+                  name: supports_individual
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: supports_teams
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+              - column:
+                  name: supports_auction
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: default_match_duration
+                  type: INTEGER
+              - column:
+                  name: metadata
+                  type: JSONB
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - sql:
+            sql: SELECT platform_master.apply_updated_at_trigger('platform_master', 'sports_categories');
+
+  - changeSet:
+      id: "202501010020-sports-categories-seed"
+      author: "mana-community-dev"
+      context: "default"
+      comment: "Seed sports categories"
+      logicalFilePath: "db/changelog/platform/master-data/202501010020-sports-categories-seed.yaml"
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              INSERT INTO platform_master.sports_categories (code, name) VALUES
+              ('CRICKET', 'Cricket'),
+              ('FOOTBALL', 'Football'),
+              ('BADMINTON', 'Badminton'),
+              ('TENNIS', 'Tennis'),
+              ('VOLLEYBALL', 'Volleyball'),
+              ('BASKETBALL', 'Basketball'),
+              ('TABLE_TENNIS', 'Table Tennis'),
+              ('CHESS', 'Chess'),
+              ('CARROM', 'Carrom'),
+              ('CYCLING', 'Cycling'),
+              ('SWIMMING', 'Swimming'),
+              ('KABADDI', 'Kabaddi'),
+              ('HOCKEY', 'Hockey'),
+              ('ATHLETICS', 'Athletics'),
+              ('SQUASH', 'Squash')
+              ON CONFLICT (code) DO NOTHING;
+      rollback:
+        - sql:
+            sql: "DELETE FROM platform_master.sports_categories;"
+
+  - changeSet:
+      id: "202501010020-sports-categories-rollback"
+      author: "mana-community-dev"
+      context: "default"
+      logicalFilePath: "db/changelog/platform/master-data/202501010020-sports-categories-rollback.yaml"
+      changes:
+        - empty: {}
+      rollback:
+        - dropTable:
+            schemaName: platform_master
+            tableName: sports_categories

@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: liquibase-migration-job
+  namespace: manacommunity-db-migration
+  labels:
+    app: liquibase-migration
+    version: v1.0
+  annotations:
+    description: "One-time database migration job for Liquibase."
+spec:
+  backoffLimit: 3
+  activeDeadlineSeconds: 600
+  template:
+    metadata:
+      labels:
+        app: liquibase-migration
+    spec:
+      restartPolicy: Never
+      initContainers:
+        - name: wait-for-db
+          image: busybox:1.31
+          command: ['sh', '-c', 'until nc -z -v -w30 $(RDS_ENDPOINT) 5432; do echo "Waiting for db"; sleep 2; done;']
+          env:
+            - name: RDS_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: liquibase-config
+                  key: DB_URL # In a real scenario parse this or pass separately
+      containers:
+        - name: liquibase-migration
+          image: "your-ecr-repo/mana-community-liquibase:latest"
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+          envFrom:
+            - configMapRef:
+                name: liquibase-config
+            - secretRef:
+                name: liquibase-secrets

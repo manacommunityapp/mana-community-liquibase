@@ -1,0 +1,153 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202504010016-event-results"
+      author: "mana-community-dev"
+      labels: "events,tables,v1.0"
+      context: "default"
+      comment: "Create event_results table"
+      logicalFilePath: "db/changelog/domains/events/tables/202504010016-event-results.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: events
+                tableName: event_results
+      changes:
+        - createTable:
+            schemaName: events
+            tableName: event_results
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_event_results
+              - column:
+                  name: event_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: result_category
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: position
+                  type: INTEGER
+              - column:
+                  name: winner_type
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: winner_user_id
+                  type: BIGINT
+              - column:
+                  name: winner_team_id
+                  type: BIGINT
+              - column:
+                  name: award_title
+                  type: VARCHAR(300)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: award_description
+                  type: TEXT
+              - column:
+                  name: prize_type
+                  type: VARCHAR(100)
+              - column:
+                  name: prize_value
+                  type: DECIMAL(12,2)
+                  defaultValueNumeric: 0
+              - column:
+                  name: prize_description
+                  type: TEXT
+              - column:
+                  name: trophy_image_url
+                  type: VARCHAR(500)
+              - column:
+                  name: certificate_url
+                  type: VARCHAR(500)
+              - column:
+                  name: stats_highlights
+                  type: JSONB
+              - column:
+                  name: is_published
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: published_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: announced_by
+                  type: BIGINT
+              - column:
+                  name: metadata
+                  type: JSONB
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            schemaName: events
+            tableName: event_results
+            columnNames: event_id, result_category, position, winner_type
+            constraintName: uq_event_results
+      rollback:
+        - dropTable:
+            schemaName: events
+            tableName: event_results

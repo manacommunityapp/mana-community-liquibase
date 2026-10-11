@@ -1,0 +1,67 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202503010040-vw-tournament-standings"
+      author: "mana-community-dev"
+      labels: "sports,view,v1.0"
+      context: "default"
+      comment: "Create tournament standings view"
+      logicalFilePath: "db/changelog/domains/sports/views/202503010040-sports-views.yaml"
+      runInTransaction: false
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              CREATE OR REPLACE VIEW sports.vw_tournament_standings AS
+              SELECT 
+                ms.tenant_id,
+                ms.tournament_id,
+                t.name as tournament_name,
+                ms.team_id,
+                tm.name as team_name,
+                ms.position,
+                ms.matches_played,
+                ms.matches_won as won,
+                ms.matches_lost as lost,
+                ms.matches_drawn as drawn,
+                ms.points,
+                ms.net_run_rate,
+                ms.is_qualified
+              FROM sports.match_standings ms
+              JOIN sports.tournaments t ON ms.tournament_id = t.id
+              JOIN sports.teams tm ON ms.team_id = tm.id
+              WHERE ms.deleted = FALSE;
+      rollback:
+        - sql:
+            sql: DROP VIEW IF EXISTS sports.vw_tournament_standings;
+
+  - changeSet:
+      id: "202503010041-vw-auction-summary"
+      author: "mana-community-dev"
+      labels: "sports,view,v1.0"
+      context: "default"
+      comment: "Create auction summary view"
+      logicalFilePath: "db/changelog/domains/sports/views/202503010040-sports-views.yaml"
+      runInTransaction: false
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              CREATE OR REPLACE VIEW sports.vw_auction_summary AS
+              SELECT 
+                p.id as player_id,
+                u.first_name || ' ' || u.last_name as player_name,
+                t.name as team_name,
+                p.auction_base_price as base_price,
+                ab.sold_amount as sold_price,
+                CASE 
+                  WHEN ab.sold_to_team_id IS NOT NULL THEN 'SOLD'
+                  ELSE 'UNSOLD'
+                END as auction_status
+              FROM sports.players p
+              JOIN auth.users u ON p.user_id = u.id
+              LEFT JOIN sports.auction_bids ab ON p.id = ab.player_id AND ab.is_winning_bid = TRUE
+              LEFT JOIN sports.teams t ON ab.sold_to_team_id = t.id
+              WHERE p.deleted = FALSE;
+      rollback:
+        - sql:
+            sql: DROP VIEW IF EXISTS sports.vw_auction_summary;

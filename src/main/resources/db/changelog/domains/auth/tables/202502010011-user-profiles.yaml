@@ -1,0 +1,180 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202502010011-create-user-profiles"
+      author: "mana-community-dev"
+      labels: "auth,table,user_profiles,v1.0"
+      context: "default"
+      comment: "Create user profiles table"
+      logicalFilePath: "db/changelog/domains/auth/tables/202502010011-user-profiles.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: auth
+                tableName: user_profiles
+      changes:
+        - createTable:
+            schemaName: auth
+            tableName: user_profiles
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    unique: true
+                    foreignKeyName: fk_user_profiles_user
+                    references: auth.users(id)
+                    deleteCascade: true
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: bio
+                  type: TEXT
+              - column:
+                  name: occupation
+                  type: VARCHAR(200)
+              - column:
+                  name: company
+                  type: VARCHAR(200)
+              - column:
+                  name: website_url
+                  type: VARCHAR(500)
+              - column:
+                  name: linkedin_url
+                  type: VARCHAR(500)
+              - column:
+                  name: instagram_url
+                  type: VARCHAR(500)
+              - column:
+                  name: facebook_url
+                  type: VARCHAR(500)
+              - column:
+                  name: twitter_url
+                  type: VARCHAR(500)
+              - column:
+                  name: address_line1
+                  type: VARCHAR(300)
+              - column:
+                  name: address_line2
+                  type: VARCHAR(300)
+              - column:
+                  name: city
+                  type: VARCHAR(100)
+              - column:
+                  name: state
+                  type: VARCHAR(100)
+              - column:
+                  name: country_code
+                  type: CHAR(2)
+              - column:
+                  name: postal_code
+                  type: VARCHAR(20)
+              - column:
+                  name: emergency_contact_name
+                  type: VARCHAR(200)
+              - column:
+                  name: emergency_contact_phone
+                  type: VARCHAR(30)
+              - column:
+                  name: blood_group
+                  type: VARCHAR(10)
+              - column:
+                  name: medical_notes
+                  type: TEXT
+              - column:
+                  name: sports_preferences
+                  type: JSONB
+              - column:
+                  name: skill_levels
+                  type: JSONB
+              - column:
+                  name: playing_positions
+                  type: JSONB
+              - column:
+                  name: certifications
+                  type: JSONB
+              - column:
+                  name: badges
+                  type: JSONB
+              - column:
+                  name: social_score
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: reputation_score
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: privacy_settings
+                  type: JSONB
+                  defaultValue: '{"profile":"public","phone":"friends","email":"private"}'
+              - column:
+                  name: notification_preferences
+                  type: JSONB
+              - column:
+                  name: custom_fields
+                  type: JSONB
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+      rollback:
+        - dropTable:
+            schemaName: auth
+            tableName: user_profiles

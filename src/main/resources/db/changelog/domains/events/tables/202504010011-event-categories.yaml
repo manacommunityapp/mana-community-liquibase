@@ -1,0 +1,118 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202504010011-event-categories"
+      author: "mana-community-dev"
+      labels: "events,tables,v1.0"
+      context: "default"
+      comment: "Create event_categories table"
+      logicalFilePath: "db/changelog/domains/events/tables/202504010011-event-categories.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: events
+                tableName: event_categories
+      changes:
+        - createTable:
+            schemaName: events
+            tableName: event_categories
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_event_categories
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: code
+                  type: VARCHAR(100)
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: icon_url
+                  type: VARCHAR(500)
+              - column:
+                  name: color
+                  type: VARCHAR(7)
+              - column:
+                  name: parent_category_id
+                  type: BIGINT
+              - column:
+                  name: sort_order
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - createIndex:
+            indexName: uq_event_categories_tenant_code
+            schemaName: events
+            tableName: event_categories
+            unique: true
+            columns:
+              - column:
+                  name: tenant_id
+              - column:
+                  name: code
+      rollback:
+        - dropTable:
+            schemaName: events
+            tableName: event_categories

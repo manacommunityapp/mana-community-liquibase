@@ -1,0 +1,439 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202502010030-idx-users-tenant-email"
+      author: "mana-community-dev"
+      labels: "auth,index,v1.0"
+      context: "default"
+      comment: "Index for users tenant and email"
+      logicalFilePath: "db/changelog/domains/auth/indexes/202502010030-auth-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_users_tenant_email
+      changes:
+        - createIndex:
+            indexName: idx_users_tenant_email
+            schemaName: auth
+            tableName: users
+            unique: true
+            columns:
+              - column:
+                  name: tenant_id
+              - column:
+                  name: email
+            where: deleted=FALSE
+      rollback:
+        - dropIndex:
+            indexName: idx_users_tenant_email
+            schemaName: auth
+            tableName: users
+
+  - changeSet:
+      id: "202502010030-idx-users-tenant-username"
+      author: "mana-community-dev"
+      labels: "auth,index,v1.0"
+      context: "default"
+      comment: "Index for users tenant and username"
+      logicalFilePath: "db/changelog/domains/auth/indexes/202502010030-auth-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_users_tenant_username
+      changes:
+        - createIndex:
+            indexName: idx_users_tenant_username
+            schemaName: auth
+            tableName: users
+            unique: true
+            columns:
+              - column:
+                  name: tenant_id
+              - column:
+                  name: username
+            where: deleted=FALSE
+      rollback:
+        - dropIndex:
+            indexName: idx_users_tenant_username
+            schemaName: auth
+            tableName: users
+
+  - changeSet:
+      id: "202502010030-idx-users-uuid"
+      author: "mana-community-dev"
+      labels: "auth,index,v1.0"
+      context: "default"
+      comment: "Index for users uuid"
+      logicalFilePath: "db/changelog/domains/auth/indexes/202502010030-auth-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_users_uuid
+      changes:
+        - createIndex:
+            indexName: idx_users_uuid
+            schemaName: auth
+            tableName: users
+            columns:
+              - column:
+                  name: uuid
+      rollback:
+        - dropIndex:
+            indexName: idx_users_uuid
+            schemaName: auth
+            tableName: users
+
+  - changeSet:
+      id: "202502010030-idx-users-phone"
+      author: "mana-community-dev"
+      labels: "auth,index,v1.0"
+      context: "default"
+      comment: "Index for users phone"
+      logicalFilePath: "db/changelog/domains/auth/indexes/202502010030-auth-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_users_phone
+      changes:
+        - createIndex:
+            indexName: idx_users_phone
+            schemaName: auth
+            tableName: users
+            columns:
+              - column:
+                  name: phone
+            where: phone IS NOT NULL AND deleted=FALSE
+      rollback:
+        - dropIndex:
+            indexName: idx_users_phone
+            schemaName: auth
+            tableName: users
+
+  - changeSet:
+      id: "202502010030-idx-users-status"
+      author: "mana-community-dev"
+      labels: "auth,index,v1.0"
+      context: "default"
+      comment: "Index for users status"
+      logicalFilePath: "db/changelog/domains/auth/indexes/202502010030-auth-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_users_status
+      changes:
+        - createIndex:
+            indexName: idx_users_status
+            schemaName: auth
+            tableName: users
+            columns:
+              - column:
+                  name: tenant_id
+              - column:
+                  name: status
+            where: deleted=FALSE
+      rollback:
+        - dropIndex:
+            indexName: idx_users_status
+            schemaName: auth
+            tableName: users
+
+  - changeSet:
+      id: "202502010030-idx-user-sessions-user-active"
+      author: "mana-community-dev"
+      labels: "auth,index,v1.0"
+      context: "default"
+      comment: "Index for active user sessions"
+      logicalFilePath: "db/changelog/domains/auth/indexes/202502010030-auth-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_user_sessions_user_active
+      changes:
+        - createIndex:
+            indexName: idx_user_sessions_user_active
+            schemaName: auth
+            tableName: user_sessions
+            columns:
+              - column:
+                  name: user_id
+              - column:
+                  name: is_active
+              - column:
+                  name: expires_at
+      rollback:
+        - dropIndex:
+            indexName: idx_user_sessions_user_active
+            schemaName: auth
+            tableName: user_sessions
+
+  - changeSet:
+      id: "202502010030-idx-user-sessions-token"
+      author: "mana-community-dev"
+      labels: "auth,index,v1.0"
+      context: "default"
+      comment: "Index for session token"
+      logicalFilePath: "db/changelog/domains/auth/indexes/202502010030-auth-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_user_sessions_token
+      changes:
+        - createIndex:
+            indexName: idx_user_sessions_token
+            schemaName: auth
+            tableName: user_sessions
+            columns:
+              - column:
+                  name: session_token
+      rollback:
+        - dropIndex:
+            indexName: idx_user_sessions_token
+            schemaName: auth
+            tableName: user_sessions
+
+  - changeSet:
+      id: "202502010030-idx-refresh-tokens-user"
+      author: "mana-community-dev"
+      labels: "auth,index,v1.0"
+      context: "default"
+      comment: "Index for refresh tokens user"
+      logicalFilePath: "db/changelog/domains/auth/indexes/202502010030-auth-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_refresh_tokens_user
+      changes:
+        - createIndex:
+            indexName: idx_refresh_tokens_user
+            schemaName: auth
+            tableName: refresh_tokens
+            columns:
+              - column:
+                  name: user_id
+              - column:
+                  name: is_revoked
+              - column:
+                  name: expires_at
+      rollback:
+        - dropIndex:
+            indexName: idx_refresh_tokens_user
+            schemaName: auth
+            tableName: refresh_tokens
+
+  - changeSet:
+      id: "202502010030-idx-refresh-tokens-hash"
+      author: "mana-community-dev"
+      labels: "auth,index,v1.0"
+      context: "default"
+      comment: "Index for refresh tokens hash"
+      logicalFilePath: "db/changelog/domains/auth/indexes/202502010030-auth-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_refresh_tokens_hash
+      changes:
+        - createIndex:
+            indexName: idx_refresh_tokens_hash
+            schemaName: auth
+            tableName: refresh_tokens
+            columns:
+              - column:
+                  name: token_hash
+      rollback:
+        - dropIndex:
+            indexName: idx_refresh_tokens_hash
+            schemaName: auth
+            tableName: refresh_tokens
+
+  - changeSet:
+      id: "202502010030-idx-otp-recipient-purpose"
+      author: "mana-community-dev"
+      labels: "auth,index,v1.0"
+      context: "default"
+      comment: "Index for otp recipient purpose"
+      logicalFilePath: "db/changelog/domains/auth/indexes/202502010030-auth-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_otp_recipient_purpose
+      changes:
+        - createIndex:
+            indexName: idx_otp_recipient_purpose
+            schemaName: auth
+            tableName: otp_verifications
+            columns:
+              - column:
+                  name: recipient
+              - column:
+                  name: purpose
+              - column:
+                  name: is_verified
+              - column:
+                  name: expires_at
+      rollback:
+        - dropIndex:
+            indexName: idx_otp_recipient_purpose
+            schemaName: auth
+            tableName: otp_verifications
+
+  - changeSet:
+      id: "202502010030-idx-login-attempts-identifier"
+      author: "mana-community-dev"
+      labels: "auth,index,v1.0"
+      context: "default"
+      comment: "Index for login attempts identifier"
+      logicalFilePath: "db/changelog/domains/auth/indexes/202502010030-auth-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_login_attempts_identifier
+      changes:
+        - createIndex:
+            indexName: idx_login_attempts_identifier
+            schemaName: auth
+            tableName: login_attempts
+            columns:
+              - column:
+                  name: identifier
+              - column:
+                  name: attempted_at
+                  descending: true
+      rollback:
+        - dropIndex:
+            indexName: idx_login_attempts_identifier
+            schemaName: auth
+            tableName: login_attempts
+
+  - changeSet:
+      id: "202502010030-idx-login-attempts-ip"
+      author: "mana-community-dev"
+      labels: "auth,index,v1.0"
+      context: "default"
+      comment: "Index for login attempts ip"
+      logicalFilePath: "db/changelog/domains/auth/indexes/202502010030-auth-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_login_attempts_ip
+      changes:
+        - createIndex:
+            indexName: idx_login_attempts_ip
+            schemaName: auth
+            tableName: login_attempts
+            columns:
+              - column:
+                  name: ip_address
+              - column:
+                  name: attempted_at
+                  descending: true
+      rollback:
+        - dropIndex:
+            indexName: idx_login_attempts_ip
+            schemaName: auth
+            tableName: login_attempts
+
+  - changeSet:
+      id: "202502010030-idx-kyc-user-status"
+      author: "mana-community-dev"
+      labels: "auth,index,v1.0"
+      context: "default"
+      comment: "Index for kyc user status"
+      logicalFilePath: "db/changelog/domains/auth/indexes/202502010030-auth-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_kyc_user_status
+      changes:
+        - createIndex:
+            indexName: idx_kyc_user_status
+            schemaName: auth
+            tableName: kyc_documents
+            columns:
+              - column:
+                  name: user_id
+              - column:
+                  name: kyc_status
+            where: deleted=FALSE
+      rollback:
+        - dropIndex:
+            indexName: idx_kyc_user_status
+            schemaName: auth
+            tableName: kyc_documents
+
+  - changeSet:
+      id: "202502010030-idx-user-profiles-sports"
+      author: "mana-community-dev"
+      labels: "auth,index,v1.0"
+      context: "default"
+      comment: "GIN Index for user profiles sports preferences"
+      logicalFilePath: "db/changelog/domains/auth/indexes/202502010030-auth-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_user_profiles_sports
+      changes:
+        - sql:
+            sql: CREATE INDEX idx_user_profiles_sports ON auth.user_profiles USING GIN (sports_preferences);
+      rollback:
+        - dropIndex:
+            indexName: idx_user_profiles_sports
+            schemaName: auth
+            tableName: user_profiles
+
+  - changeSet:
+      id: "202502010030-idx-user-devices-fingerprint"
+      author: "mana-community-dev"
+      labels: "auth,index,v1.0"
+      context: "default"
+      comment: "Index for user devices fingerprint"
+      logicalFilePath: "db/changelog/domains/auth/indexes/202502010030-auth-indexes.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - indexExists:
+                indexName: idx_user_devices_fingerprint
+      changes:
+        - createIndex:
+            indexName: idx_user_devices_fingerprint
+            schemaName: auth
+            tableName: user_devices
+            unique: true
+            columns:
+              - column:
+                  name: user_id
+              - column:
+                  name: device_fingerprint
+            where: deleted=FALSE
+      rollback:
+        - dropIndex:
+            indexName: idx_user_devices_fingerprint
+            schemaName: auth
+            tableName: user_devices

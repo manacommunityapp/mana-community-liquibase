@@ -1,0 +1,139 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202502010015-create-refresh-tokens"
+      author: "mana-community-dev"
+      labels: "auth,table,refresh_tokens,v1.0"
+      context: "default"
+      comment: "Create refresh tokens table"
+      logicalFilePath: "db/changelog/domains/auth/tables/202502010015-refresh-tokens.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: auth
+                tableName: refresh_tokens
+      changes:
+        - createTable:
+            schemaName: auth
+            tableName: refresh_tokens
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: token_hash
+                  type: VARCHAR(500)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_refresh_tokens_user
+                    references: auth.users(id)
+              - column:
+                  name: session_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_refresh_tokens_session
+                    references: auth.user_sessions(id)
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: device_id
+                  type: BIGINT
+              - column:
+                  name: issued_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: expires_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: rotated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: revoked_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: revocation_reason
+                  type: VARCHAR(100)
+              - column:
+                  name: replaced_by_token_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_refresh_tokens_replaced_by
+                    references: auth.refresh_tokens(id)
+              - column:
+                  name: ip_address
+                  type: VARCHAR(45)
+              - column:
+                  name: is_revoked
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+      rollback:
+        - dropTable:
+            schemaName: auth
+            tableName: refresh_tokens

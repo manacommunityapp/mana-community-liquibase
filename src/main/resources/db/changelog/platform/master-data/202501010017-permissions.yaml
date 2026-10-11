@@ -1,0 +1,260 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202501010017-permissions"
+      author: "mana-community-dev"
+      labels: "platform,schema,v1.0"
+      context: "default"
+      comment: "Create permissions and role_permissions tables"
+      logicalFilePath: "db/changelog/platform/master-data/202501010017-permissions.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: platform_master
+                tableName: permissions
+      changes:
+        - createTable:
+            schemaName: platform_master
+            tableName: permissions
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: code
+                  type: VARCHAR(200)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(300)
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: module
+                  type: VARCHAR(100)
+              - column:
+                  name: action
+                  type: VARCHAR(50)
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - sql:
+            sql: SELECT platform_master.apply_updated_at_trigger('platform_master', 'permissions');
+
+        - createTable:
+            schemaName: platform_master
+            tableName: role_permissions
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: role_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: permission_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: granted_by
+                  type: BIGINT
+              - column:
+                  name: granted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            schemaName: platform_master
+            tableName: role_permissions
+            constraintName: uq_role_permissions_role_perm
+            columnNames: role_id, permission_id
+        - addForeignKeyConstraint:
+            baseTableSchemaName: platform_master
+            baseTableName: role_permissions
+            baseColumnNames: role_id
+            referencedTableSchemaName: platform_master
+            referencedTableName: roles
+            referencedColumnNames: id
+            constraintName: fk_role_permissions_role
+        - addForeignKeyConstraint:
+            baseTableSchemaName: platform_master
+            baseTableName: role_permissions
+            baseColumnNames: permission_id
+            referencedTableSchemaName: platform_master
+            referencedTableName: permissions
+            referencedColumnNames: id
+            constraintName: fk_role_permissions_permission
+        - sql:
+            sql: SELECT platform_master.apply_updated_at_trigger('platform_master', 'role_permissions');
+
+  - changeSet:
+      id: "202501010017-permissions-seed"
+      author: "mana-community-dev"
+      context: "default"
+      comment: "Seed permissions data"
+      logicalFilePath: "db/changelog/platform/master-data/202501010017-permissions-seed.yaml"
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              INSERT INTO platform_master.permissions (code, name, module, action) VALUES
+              ('AUTH_USER_CREATE', 'Create User', 'AUTH', 'CREATE'),
+              ('AUTH_USER_READ', 'Read User', 'AUTH', 'READ'),
+              ('AUTH_USER_UPDATE', 'Update User', 'AUTH', 'UPDATE'),
+              ('AUTH_USER_DELETE', 'Delete User', 'AUTH', 'DELETE'),
+              ('AUTH_ROLE_ASSIGN', 'Assign Role', 'AUTH', 'UPDATE'),
+              
+              ('SPORTS_TOURNAMENT_CREATE', 'Create Tournament', 'SPORTS', 'CREATE'),
+              ('SPORTS_TOURNAMENT_READ', 'Read Tournament', 'SPORTS', 'READ'),
+              ('SPORTS_TOURNAMENT_UPDATE', 'Update Tournament', 'SPORTS', 'UPDATE'),
+              ('SPORTS_TOURNAMENT_DELETE', 'Delete Tournament', 'SPORTS', 'DELETE'),
+              ('SPORTS_TEAM_CREATE', 'Create Team', 'SPORTS', 'CREATE'),
+              ('SPORTS_TEAM_READ', 'Read Team', 'SPORTS', 'READ'),
+              ('SPORTS_TEAM_UPDATE', 'Update Team', 'SPORTS', 'UPDATE'),
+              ('SPORTS_TEAM_DELETE', 'Delete Team', 'SPORTS', 'DELETE'),
+              ('SPORTS_MATCH_CREATE', 'Create Match', 'SPORTS', 'CREATE'),
+              ('SPORTS_MATCH_UPDATE', 'Update Match', 'SPORTS', 'UPDATE'),
+              
+              ('EVENTS_EVENT_CREATE', 'Create Event', 'EVENTS', 'CREATE'),
+              ('EVENTS_EVENT_READ', 'Read Event', 'EVENTS', 'READ'),
+              ('EVENTS_EVENT_UPDATE', 'Update Event', 'EVENTS', 'UPDATE'),
+              ('EVENTS_EVENT_DELETE', 'Delete Event', 'EVENTS', 'DELETE'),
+              ('EVENTS_REGISTRATION_CREATE', 'Create Registration', 'EVENTS', 'CREATE'),
+              ('EVENTS_REGISTRATION_READ', 'Read Registration', 'EVENTS', 'READ'),
+              ('EVENTS_REGISTRATION_UPDATE', 'Update Registration', 'EVENTS', 'UPDATE'),
+              ('EVENTS_REGISTRATION_APPROVE', 'Approve Registration', 'EVENTS', 'APPROVE'),
+              ('EVENTS_SPONSOR_CREATE', 'Create Sponsor', 'EVENTS', 'CREATE'),
+              ('EVENTS_SPONSOR_READ', 'Read Sponsor', 'EVENTS', 'READ'),
+              
+              ('PLATFORM_TENANT_CREATE', 'Create Tenant', 'PLATFORM', 'CREATE'),
+              ('PLATFORM_TENANT_READ', 'Read Tenant', 'PLATFORM', 'READ'),
+              ('PLATFORM_TENANT_UPDATE', 'Update Tenant', 'PLATFORM', 'UPDATE'),
+              ('PLATFORM_SETTINGS_READ', 'Read Settings', 'PLATFORM', 'READ'),
+              ('PLATFORM_SETTINGS_UPDATE', 'Update Settings', 'PLATFORM', 'UPDATE')
+              ON CONFLICT (code) DO NOTHING;
+      rollback:
+        - sql:
+            sql: "DELETE FROM platform_master.permissions;"
+
+  - changeSet:
+      id: "202501010017-permissions-rollback-tables"
+      author: "mana-community-dev"
+      context: "default"
+      logicalFilePath: "db/changelog/platform/master-data/202501010017-permissions-rollback-tables.yaml"
+      changes:
+        - empty: {}
+      rollback:
+        - dropTable:
+            schemaName: platform_master
+            tableName: role_permissions
+        - dropTable:
+            schemaName: platform_master
+            tableName: permissions

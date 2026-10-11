@@ -1,0 +1,59 @@
+databaseChangeLog:
+  # Platform Layer — Master Include File
+  # Executes all platform-level migrations in dependency order
+
+  - include:
+      file: db/changelog/platform/schema/202501010001-create-schemas.yaml
+      relativeToChangelogFile: false
+
+  - include:
+      file: db/changelog/platform/schema/202501010002-create-enum-types.yaml
+      relativeToChangelogFile: false
+
+  - include:
+      file: db/changelog/platform/shared-functions/202501010060-fn-updated-at-trigger.yaml
+      relativeToChangelogFile: false
+
+  - include:
+      file: db/changelog/platform/shared-functions/202501010061-fn-soft-delete.yaml
+      relativeToChangelogFile: false
+
+  - include:
+      file: db/changelog/platform/configuration/202501010050-tenant-config.yaml
+      relativeToChangelogFile: false
+
+  - include:
+      file: db/changelog/platform/configuration/202501010051-system-settings.yaml
+      relativeToChangelogFile: false
+
+  - include:
+      file: db/changelog/platform/configuration/202501010052-feature-flags-table.yaml
+      relativeToChangelogFile: false
+
+  - include:
+      file: db/changelog/platform/master-data/202501010010-countries.yaml
+      relativeToChangelogFile: false
+
+  - include:
+      file: db/changelog/platform/master-data/202501010016-roles.yaml
+      relativeToChangelogFile: false
+
+  - include:
+      file: db/changelog/platform/master-data/202501010017-permissions.yaml
+      relativeToChangelogFile: false
+
+  - include:
+      file: db/changelog/platform/master-data/202501010020-sports-categories.yaml
+      relativeToChangelogFile: false
+
+  - include:
+      file: db/changelog/platform/audit/202501010030-audit-log-table.yaml
+      relativeToChangelogFile: false
+
+  - include:
+      file: db/changelog/platform/notification/202501010040-notification-templates.yaml
+      relativeToChangelogFile: false
+
+  - include:
+      file: db/changelog/platform/shared-views/202501010070-vw-tenant-summary.yaml
+      relativeToChangelogFile: false

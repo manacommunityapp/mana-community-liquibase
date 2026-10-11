@@ -1,0 +1,38 @@
+databaseChangeLog:
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  #  ROOT CHANGELOG — Mana Community OS · Multi-Tenant Enterprise Migration
+  # ═══════════════════════════════════════════════════════════════════════════
+  #
+  #  Execution order MUST be maintained:
+  #    1. Platform Layer  → shared infra, schemas, master data, audit
+  #    2. Domain Layer    → auth, sports, events (independent microservices)
+  #    3. Release Layer   → versioned bundling, rollups, performance patches
+  #
+  #  Usage:
+  #    mvn liquibase:update -Plocal
+  #    mvn liquibase:update -Pprod -Ddb.password=${SECRET}
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  # ── Layer 1: Platform ────────────────────────────────────────────────────
+  - include:
+      file: db/changelog/platform/db.changelog-platform.yaml
+      relativeToChangelogFile: false
+
+  # ── Layer 2: Domains ─────────────────────────────────────────────────────
+  - include:
+      file: db/changelog/domains/auth/db.changelog-auth.yaml
+      relativeToChangelogFile: false
+
+  - include:
+      file: db/changelog/domains/sports/db.changelog-sports.yaml
+      relativeToChangelogFile: false
+
+  - include:
+      file: db/changelog/domains/events/db.changelog-events.yaml
+      relativeToChangelogFile: false
+
+  # ── Layer 3: Releases ────────────────────────────────────────────────────
+  - include:
+      file: db/changelog/releases/db.changelog-releases.yaml
+      relativeToChangelogFile: false

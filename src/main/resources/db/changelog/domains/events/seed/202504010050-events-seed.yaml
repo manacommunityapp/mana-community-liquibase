@@ -1,0 +1,69 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202504010050-events-seed"
+      author: "mana-community-dev"
+      labels: "events,seed,v1.0"
+      context: "default,dev"
+      comment: "Seed event categories"
+      logicalFilePath: "db/changelog/domains/events/seed/202504010050-events-seed.yaml"
+      runInTransaction: false
+      changes:
+        - insert:
+            schemaName: events
+            tableName: event_categories
+            columns:
+              - column: { name: tenant_id, valueNumeric: 1 }
+              - column: { name: code, value: 'SPORTS_EVENT' }
+              - column: { name: name, value: 'Sports Event' }
+              - column: { name: color, value: '#ff0000' }
+              - column: { name: created_by, valueNumeric: 0 }
+        - insert:
+            schemaName: events
+            tableName: event_categories
+            columns:
+              - column: { name: tenant_id, valueNumeric: 1 }
+              - column: { name: code, value: 'SOCIAL_EVENT' }
+              - column: { name: name, value: 'Social Event' }
+              - column: { name: color, value: '#00ff00' }
+              - column: { name: created_by, valueNumeric: 0 }
+        - insert:
+            schemaName: events
+            tableName: event_categories
+            columns:
+              - column: { name: tenant_id, valueNumeric: 1 }
+              - column: { name: code, value: 'CORPORATE_EVENT' }
+              - column: { name: name, value: 'Corporate Event' }
+              - column: { name: color, value: '#0000ff' }
+              - column: { name: created_by, valueNumeric: 0 }
+        - insert:
+            schemaName: events
+            tableName: event_categories
+            columns:
+              - column: { name: tenant_id, valueNumeric: 1 }
+              - column: { name: code, value: 'CHARITY_EVENT' }
+              - column: { name: name, value: 'Charity Event' }
+              - column: { name: color, value: '#ffff00' }
+              - column: { name: created_by, valueNumeric: 0 }
+        - insert:
+            schemaName: events
+            tableName: event_categories
+            columns:
+              - column: { name: tenant_id, valueNumeric: 1 }
+              - column: { name: code, value: 'TRAINING_EVENT' }
+              - column: { name: name, value: 'Training Event' }
+              - column: { name: color, value: '#ff00ff' }
+              - column: { name: created_by, valueNumeric: 0 }
+        - insert:
+            schemaName: events
+            tableName: event_categories
+            columns:
+              - column: { name: tenant_id, valueNumeric: 1 }
+              - column: { name: code, value: 'CULTURAL_EVENT' }
+              - column: { name: name, value: 'Cultural Event' }
+              - column: { name: color, value: '#00ffff' }
+              - column: { name: created_by, valueNumeric: 0 }
+      rollback:
+        - delete:
+            schemaName: events
+            tableName: event_categories
+            where: "tenant_id = 1"

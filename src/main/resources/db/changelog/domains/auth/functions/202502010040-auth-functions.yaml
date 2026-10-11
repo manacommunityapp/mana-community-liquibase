@@ -1,0 +1,102 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202502010040-auth-functions"
+      author: "mana-community-dev"
+      labels: "auth,function,v1.0"
+      context: "default"
+      comment: "Create auth schema functions"
+      logicalFilePath: "db/changelog/domains/auth/functions/202502010040-auth-functions.yaml"
+      runInTransaction: false
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              CREATE OR REPLACE FUNCTION auth.fn_get_user_roles(p_user_id BIGINT, p_tenant_id BIGINT)
+              RETURNS TABLE(role_id BIGINT, role_name VARCHAR, role_level INT) AS $$
+              BEGIN
+                  RETURN QUERY
+                  SELECT r.id, r.name, r.level
+                  FROM auth.user_roles ur
+                  JOIN platform_master.roles r ON ur.role_id = r.id
+                  WHERE ur.user_id = p_user_id
+                    AND ur.tenant_id = p_tenant_id
+                    AND ur.deleted = FALSE
+                    AND r.deleted = FALSE
+                    AND (ur.expires_at IS NULL OR ur.expires_at > CURRENT_TIMESTAMP);
+              END;
+              $$ LANGUAGE plpgsql;
+        
+        - sql:
+            splitStatements: false
+            sql: |
+              CREATE OR REPLACE FUNCTION auth.fn_has_permission(p_user_id BIGINT, p_tenant_id BIGINT, p_permission_code VARCHAR)
+              RETURNS BOOLEAN AS $$
+              DECLARE
+                  v_has_perm BOOLEAN;
+              BEGIN
+                  SELECT EXISTS (
+                      SELECT 1
+                      FROM auth.user_roles ur
+                      JOIN platform_master.role_permissions rp ON ur.role_id = rp.role_id
+                      JOIN platform_master.permissions p ON rp.permission_id = p.id
+                      WHERE ur.user_id = p_user_id
+                        AND ur.tenant_id = p_tenant_id
+                        AND ur.deleted = FALSE
+                        AND (ur.expires_at IS NULL OR ur.expires_at > CURRENT_TIMESTAMP)
+                        AND rp.deleted = FALSE
+                        AND p.deleted = FALSE
+                        AND p.code = p_permission_code
+                  ) INTO v_has_perm;
+                  
+                  RETURN v_has_perm;
+              END;
+              $$ LANGUAGE plpgsql;
+
+        - sql:
+            splitStatements: false
+            sql: |
+              CREATE OR REPLACE FUNCTION auth.fn_is_account_locked(p_user_id BIGINT)
+              RETURNS BOOLEAN AS $$
+              DECLARE
+                  v_is_locked BOOLEAN;
+              BEGIN
+                  SELECT EXISTS (
+                      SELECT 1
+                      FROM auth.users
+                      WHERE id = p_user_id
+                        AND locked_until IS NOT NULL
+                        AND locked_until > CURRENT_TIMESTAMP
+                        AND deleted = FALSE
+                  ) INTO v_is_locked;
+                  
+                  RETURN v_is_locked;
+              END;
+              $$ LANGUAGE plpgsql;
+
+        - sql:
+            splitStatements: false
+            sql: |
+              CREATE OR REPLACE FUNCTION auth.fn_increment_failed_login(p_user_id BIGINT, p_max_attempts INTEGER DEFAULT 5)
+              RETURNS VOID AS $$
+              DECLARE
+                  v_current_count INTEGER;
+              BEGIN
+                  UPDATE auth.users
+                  SET failed_login_count = failed_login_count + 1
+                  WHERE id = p_user_id AND deleted = FALSE
+                  RETURNING failed_login_count INTO v_current_count;
+                  
+                  IF v_current_count >= p_max_attempts THEN
+                      UPDATE auth.users
+                      SET locked_until = CURRENT_TIMESTAMP + INTERVAL '30 minutes'
+                      WHERE id = p_user_id AND deleted = FALSE;
+                  END IF;
+              END;
+              $$ LANGUAGE plpgsql;
+      rollback:
+        - sql:
+            sql: |
+              DROP FUNCTION IF EXISTS auth.fn_get_user_roles(BIGINT, BIGINT);
+              DROP FUNCTION IF EXISTS auth.fn_has_permission(BIGINT, BIGINT, VARCHAR);
+              DROP FUNCTION IF EXISTS auth.fn_is_account_locked(BIGINT);
+              DROP FUNCTION IF EXISTS auth.fn_increment_failed_login(BIGINT, INTEGER);

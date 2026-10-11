@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202501010070-vw-tenant-summary"
+      author: "mana-community-dev"
+      labels: "platform,views,v1.0"
+      context: "default"
+      comment: "Create tenant summary view"
+      logicalFilePath: "db/changelog/platform/shared-views/202501010070-vw-tenant-summary.yaml"
+      runInTransaction: false
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              CREATE OR REPLACE VIEW platform_master.vw_tenant_summary AS
+              SELECT 
+                  id,
+                  tenant_code,
+                  name,
+                  domain,
+                  contact_email,
+                  subscription_plan,
+                  current_users,
+                  max_users,
+                  status,
+                  created_at
+              FROM platform_master.tenants
+              WHERE deleted = false;
+      rollback:
+        - sql:
+            sql: DROP VIEW IF EXISTS platform_master.vw_tenant_summary;

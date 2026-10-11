@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!-- ════════════════════════════════════════════════════
+         08 — Warehouse & Stock Operations Schema
+         ════════════════════════════════════════════════════ -->
+
+    <!-- Products Catalog -->
+    <changeSet author="community-dev" id="v1.0.0-08-01">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="products"/></not>
+        </preConditions>
+        <createTable tableName="products">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="products_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR(120)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sku" type="VARCHAR(40)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uq_product_sku"/>
+            </column>
+            <column name="barcode" type="VARCHAR(40)"/>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="price" type="DECIMAL(12,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Warehouse -->
+    <changeSet author="community-dev" id="v1.0.0-08-02">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="stock_warehouse"/></not>
+        </preConditions>
+        <createTable tableName="stock_warehouse">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="stock_warehouse_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR(120)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(10)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uq_warehouse_code"/>
+            </column>
+            <column name="partner_id" type="BIGINT"/>
+            <column name="lot_stock_id" type="BIGINT"/>
+            <column name="reception_steps" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="delivery_steps" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Stock Location -->
+    <changeSet author="community-dev" id="v1.0.0-08-03">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="stock_location"/></not>
+        </preConditions>
+        <createTable tableName="stock_location">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="stock_location_pkey"/>
+            </column>
+            <column name="complete_name" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uq_location_complete_name"/>
+            </column>
+            <column name="usage" type="VARCHAR(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="location_id" type="BIGINT"/>
+            <column name="barcode" type="VARCHAR(40)"/>
+            <column name="warehouse_id" type="BIGINT">
+                <constraints foreignKeyName="fk_location_warehouse" referencedTableName="stock_warehouse" referencedColumnNames="id" deleteCascade="true"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Operation Types -->
+    <changeSet author="community-dev" id="v1.0.0-08-04">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="stock_picking_type"/></not>
+        </preConditions>
+        <createTable tableName="stock_picking_type">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="stock_picking_type_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR(120)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="warehouse_id" type="BIGINT">
+                <constraints foreignKeyName="fk_picking_type_warehouse" referencedTableName="stock_warehouse" referencedColumnNames="id" deleteCascade="true"/>
+            </column>
+            <column name="default_location_src_id" type="BIGINT">
+                <constraints foreignKeyName="fk_picking_type_src_loc" referencedTableName="stock_location" referencedColumnNames="id"/>
+            </column>
+            <column name="default_location_dest_id" type="BIGINT">
+                <constraints foreignKeyName="fk_picking_type_dest_loc" referencedTableName="stock_location" referencedColumnNames="id"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Transfer Header (Picking) -->
+    <changeSet author="community-dev" id="v1.0.0-08-05">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="stock_picking"/></not>
+        </preConditions>
+        <createTable tableName="stock_picking">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="stock_picking_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR(60)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uq_picking_name"/>
+            </column>
+            <column name="origin" type="VARCHAR(80)"/>
+            <column name="state" type="VARCHAR(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="scheduled_date" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="location_id" type="BIGINT">
+                <constraints foreignKeyName="fk_picking_src_loc" referencedTableName="stock_location" referencedColumnNames="id"/>
+            </column>
+            <column name="location_dest_id" type="BIGINT">
+                <constraints foreignKeyName="fk_picking_dest_loc" referencedTableName="stock_location" referencedColumnNames="id"/>
+            </column>
+            <column name="picking_type_id" type="BIGINT">
+                <constraints foreignKeyName="fk_picking_type" referencedTableName="stock_picking_type" referencedColumnNames="id"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Stock Move -->
+    <changeSet author="community-dev" id="v1.0.0-08-06">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="stock_move"/></not>
+        </preConditions>
+        <createTable tableName="stock_move">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="stock_move_pkey"/>
+            </column>
+            <column name="product_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_move_product" referencedTableName="products" referencedColumnNames="id"/>
+            </column>
+            <column name="product_uom_qty" type="DOUBLE PRECISION">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity" type="DOUBLE PRECISION">
+                <constraints nullable="false"/>
+            </column>
+            <column name="state" type="VARCHAR(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="picking_id" type="BIGINT">
+                <constraints foreignKeyName="fk_move_picking" referencedTableName="stock_picking" referencedColumnNames="id" deleteCascade="true"/>
+            </column>
+            <column name="location_id" type="BIGINT">
+                <constraints foreignKeyName="fk_move_src_loc" referencedTableName="stock_location" referencedColumnNames="id"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Lots / Serials -->
+    <changeSet author="community-dev" id="v1.0.0-08-07">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="stock_lot"/></not>
+        </preConditions>
+        <createTable tableName="stock_lot">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="stock_lot_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR(80)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_lot_product" referencedTableName="products" referencedColumnNames="id"/>
+            </column>
+            <column name="product_qty" type="DOUBLE PRECISION">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <constraints uniqueConstraintName="uq_product_lot_name" columnNames="product_id, name"/>
+        </createTable>
+    </changeSet>
+
+    <!-- Stock Move Line -->
+    <changeSet author="community-dev" id="v1.0.0-08-08">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="stock_move_line"/></not>
+        </preConditions>
+        <createTable tableName="stock_move_line">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="stock_move_line_pkey"/>
+            </column>
+            <column name="product_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_moveline_product" referencedTableName="products" referencedColumnNames="id"/>
+            </column>
+            <column name="lot_id" type="BIGINT">
+                <constraints foreignKeyName="fk_moveline_lot" referencedTableName="stock_lot" referencedColumnNames="id"/>
+            </column>
+            <column name="quantity" type="DOUBLE PRECISION">
+                <constraints nullable="false"/>
+            </column>
+            <column name="location_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_moveline_src_loc" referencedTableName="stock_location" referencedColumnNames="id"/>
+            </column>
+            <column name="location_dest_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_moveline_dest_loc" referencedTableName="stock_location" referencedColumnNames="id"/>
+            </column>
+            <column name="result_package_id" type="BIGINT"/>
+            <column name="move_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_moveline_move" referencedTableName="stock_move" referencedColumnNames="id" deleteCascade="true"/>
+            </column>
+            <column name="picking_id" type="BIGINT">
+                <constraints foreignKeyName="fk_moveline_picking" referencedTableName="stock_picking" referencedColumnNames="id"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Stock Quant (Current Stock Levels Balance) -->
+    <changeSet author="community-dev" id="v1.0.0-08-09">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="stock_quant"/></not>
+        </preConditions>
+        <createTable tableName="stock_quant">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="stock_quant_pkey"/>
+            </column>
+            <column name="product_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_quant_product" referencedTableName="products" referencedColumnNames="id"/>
+            </column>
+            <column name="location_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_quant_location" referencedTableName="stock_location" referencedColumnNames="id" deleteCascade="true"/>
+            </column>
+            <column name="quantity" type="DOUBLE PRECISION">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reserved_quantity" type="DOUBLE PRECISION">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lot_id" type="BIGINT">
+                <constraints foreignKeyName="fk_quant_lot" referencedTableName="stock_lot" referencedColumnNames="id"/>
+            </column>
+            <column name="in_date" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <constraints uniqueConstraintName="uq_product_loc_lot" columnNames="product_id, location_id, lot_id"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

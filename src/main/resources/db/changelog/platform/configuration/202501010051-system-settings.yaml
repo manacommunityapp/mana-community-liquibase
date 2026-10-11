@@ -1,0 +1,141 @@
+databaseChangeLog:
+  - changeSet:
+      id: "202501010051-system-settings"
+      author: "mana-community-dev"
+      labels: "platform,schema,v1.0"
+      context: "default"
+      comment: "Create system settings table"
+      logicalFilePath: "db/changelog/platform/configuration/202501010051-system-settings.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: platform_config
+                tableName: system_settings
+      changes:
+        - createTable:
+            schemaName: platform_config
+            tableName: system_settings
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: category
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: key
+                  type: VARCHAR(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: value
+                  type: TEXT
+              - column:
+                  name: value_type
+                  type: VARCHAR(50)
+                  defaultValue: 'STRING'
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: is_encrypted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: is_tenant_specific
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+              - column:
+                  name: environment
+                  type: VARCHAR(20)
+                  defaultValue: 'ALL'
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            schemaName: platform_config
+            tableName: system_settings
+            constraintName: uq_system_settings_tenant_category_key
+            columnNames: tenant_id, category, key
+        - createIndex:
+            indexName: idx_system_settings_tenant_category
+            schemaName: platform_config
+            tableName: system_settings
+            columns:
+              - column:
+                  name: tenant_id
+              - column:
+                  name: category
+        - addForeignKeyConstraint:
+            baseTableSchemaName: platform_config
+            baseTableName: system_settings
+            baseColumnNames: tenant_id
+            referencedTableSchemaName: platform_master
+            referencedTableName: tenants
+            referencedColumnNames: id
+            constraintName: fk_system_settings_tenant
+        - sql:
+            sql: SELECT platform_master.apply_updated_at_trigger('platform_config', 'system_settings');
+      rollback:
+        - dropTable:
+            schemaName: platform_config
+            tableName: system_settings
