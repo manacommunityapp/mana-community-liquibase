@@ -7,25 +7,48 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.5</version>
+        <version>3.4.1</version>
         <relativePath/>
     </parent>
 
     <groupId>com.manacommunity</groupId>
     <artifactId>mana-community-liquibase</artifactId>
-    <version>1.0.0</version>
-    <name>Mana Community Liquibase</name>
-    <description>Database migration management for Mana Community platform</description>
+    <version>2.0.0</version>
+    <name>Mana Community — Enterprise Liquibase Migration Service</name>
+    <description>
+        Enterprise-grade, multi-tenant, schema-per-tenant database migration service.
+        Layer 1: Platform | Layer 2: Domain (Auth, Sports, Events) | Layer 3: Releases.
+        Stack: Java 21 · Spring Boot 3.3.x · Liquibase 4.27 · PostgreSQL 16+
+    </description>
 
     <properties>
+        <java.version>17</java.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Liquibase -->
         <liquibase.version>4.27.0</liquibase.version>
+
+        <!-- PostgreSQL -->
         <postgresql.version>42.7.3</postgresql.version>
+
+        <!-- HikariCP (managed by Spring Boot BOM) -->
+        <!-- SnakeYAML (managed by Spring Boot BOM) -->
+
+        <!-- Database connection defaults (overridden by Maven profiles) -->
+        <db.url>jdbc:postgresql://localhost:5432/manacommunity_db</db.url>
+        <db.username>manacommunity</db.username>
+        <db.password>changeme</db.password>
+        <db.default.schema>platform_master</db.default.schema>
+        <db.changelog.file>db/changelog/db.changelog-root.yaml</db.changelog.file>
+        <db.liquibase.contexts>default</db.liquibase.contexts>
+        <db.liquibase.labels></db.liquibase.labels>
     </properties>
 
     <dependencies>
+
+        <!-- ─── Spring Boot ─────────────────────────────────────────────── -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -35,51 +58,188 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- ─── Liquibase ────────────────────────────────────────────────── -->
+        <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
             <version>${liquibase.version}</version>
         </dependency>
+
+        <!-- ─── PostgreSQL ───────────────────────────────────────────────── -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgresql.version}</version>
+            <scope>runtime</scope>
         </dependency>
+
+        <!-- ─── Configuration Processor ─────────────────────────────────── -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- ─── Test ─────────────────────────────────────────────────────── -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
         <plugins>
+
+            <!-- ─── Spring Boot Maven Plugin ────────────────────────────── -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-configuration-processor</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <!-- ─── Maven Compiler Plugin (Java 21) ─────────────────────── -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>21</source>
+                    <target>21</target>
+                    <compilerArgs>
+                        <arg>--enable-preview</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+
+            <!-- ─── Liquibase Maven Plugin ───────────────────────────────── -->
             <plugin>
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-maven-plugin</artifactId>
                 <version>${liquibase.version}</version>
                 <configuration>
-                    <changeLogFile>db/changelog/db.changelog-master.xml</changeLogFile>
+                    <changeLogFile>${db.changelog.file}</changeLogFile>
                     <searchPath>src/main/resources</searchPath>
                     <url>${db.url}</url>
                     <username>${db.username}</username>
                     <password>${db.password}</password>
                     <driver>org.postgresql.Driver</driver>
-                    <defaultSchemaName>${db.schema}</defaultSchemaName>
+                    <defaultSchemaName>${db.default.schema}</defaultSchemaName>
+                    <liquibaseSchemaName>liquibase_meta</liquibaseSchemaName>
+                    <databaseChangeLogTableName>DATABASE_CHANGE_LOG</databaseChangeLogTableName>
+                    <databaseChangeLogLockTableName>DATABASE_CHANGE_LOG_LOCK</databaseChangeLogLockTableName>
+                    <contexts>${db.liquibase.contexts}</contexts>
+                    <labels>${db.liquibase.labels}</labels>
                     <outputDefaultSchema>false</outputDefaultSchema>
                     <outputDefaultCatalog>false</outputDefaultCatalog>
+                    <promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
+                    <verbose>true</verbose>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.postgresql</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>${postgresql.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
+
         </plugins>
     </build>
 
+    <!-- ═══════════════════════════════════════════════════════════════════
+         Maven Profiles — one per environment
+         Usage:  mvn liquibase:update -Plocal
+                 mvn liquibase:update -Pprod -Ddb.password=secret
+         ═══════════════════════════════════════════════════════════════════ -->
     <profiles>
+
+        <!-- LOCAL — developer workstation -->
         <profile>
             <id>local</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <properties>
-                <db.url>jdbc:postgresql://localhost:5432/postgres?currentSchema=manacommunity</db.url>
+        <db.url>jdbc:postgresql://localhost:5432/postgres?currentSchema=manacommunity</db.url>
                 <db.username>postgres</db.username>
-                <db.password>changeme</db.password>
-                <db.schema>manacommunity</db.schema>
+                <db.password>mana@community@8008</db.password>
+                <db.default.schema>manacommunity</db.default.schema>
+                <db.liquibase.contexts>default,local,dev</db.liquibase.contexts>
             </properties>
         </profile>
+
+        <!-- CI — GitHub Actions service container -->
+        <profile>
+            <id>ci</id>
+            <properties>
+                <db.url>jdbc:postgresql://localhost:5432/manacommunity_db</db.url>
+                <db.username>postgres</db.username>
+                <db.password>password</db.password>
+                <db.default.schema>platform_master</db.default.schema>
+                <db.liquibase.contexts>default</db.liquibase.contexts>
+            </properties>
+        </profile>
+
+        <!-- DEV — development server -->
+        <profile>
+            <id>dev</id>
+            <properties>
+                <db.url>jdbc:postgresql://${DEV_DB_HOST:dev-db}:5432/manacommunity_db</db.url>
+                <db.username>${DEV_DB_USER:manacommunity}</db.username>
+                <db.password>${DEV_DB_PASS:changeme}</db.password>
+                <db.default.schema>platform_master</db.default.schema>
+                <db.liquibase.contexts>default,dev</db.liquibase.contexts>
+            </properties>
+        </profile>
+
+        <!-- QA — test environment -->
+        <profile>
+            <id>qa</id>
+            <properties>
+                <db.url>jdbc:postgresql://${QA_DB_HOST:qa-db}:5432/manacommunity_db</db.url>
+                <db.username>${QA_DB_USER:manacommunity}</db.username>
+                <db.password>${QA_DB_PASS:changeme}</db.password>
+                <db.default.schema>platform_master</db.default.schema>
+                <db.liquibase.contexts>default,qa</db.liquibase.contexts>
+            </properties>
+        </profile>
+
+        <!-- UAT — user acceptance testing -->
+        <profile>
+            <id>uat</id>
+            <properties>
+                <db.url>jdbc:postgresql://${UAT_DB_HOST:uat-db}:5432/manacommunity_db</db.url>
+                <db.username>${UAT_DB_USER:manacommunity}</db.username>
+                <db.password>${UAT_DB_PASS:changeme}</db.password>
+                <db.default.schema>platform_master</db.default.schema>
+                <db.liquibase.contexts>default,uat</db.liquibase.contexts>
+            </properties>
+        </profile>
+
+        <!-- PROD — AWS RDS / production -->
+        <profile>
+            <id>prod</id>
+            <properties>
+                <db.url>jdbc:postgresql://${RDS_ENDPOINT}:5432/manacommunity_db?ssl=true&amp;sslmode=require</db.url>
+                <db.username>${DB_USER}</db.username>
+                <db.password>${DB_PASS}</db.password>
+                <db.default.schema>platform_master</db.default.schema>
+                <db.liquibase.contexts>default,prod</db.liquibase.contexts>
+            </properties>
+        </profile>
+
     </profiles>
+
 </project>
