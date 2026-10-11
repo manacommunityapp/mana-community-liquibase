@@ -1,0 +1,132 @@
+﻿databaseChangeLog:
+  - changeSet:
+      id: "202501010049-organizations"
+      author: "mana-community-dev"
+      labels: "platform,schema,organizations,v1.0"
+      context: "default"
+      comment: "Create organizations table"
+      logicalFilePath: "db/changelog/platform/master-data/202501010049-organizations.yaml"
+      runInTransaction: false
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                schemaName: platform_master
+                tableName: organizations
+      changes:
+        - createTable:
+            schemaName: platform_master
+            tableName: organizations
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(150)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: code
+                  type: VARCHAR(50)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: business_registration_no
+                  type: VARCHAR(100)
+              - column:
+                  name: tier
+                  type: VARCHAR(30)
+                  defaultValue: "ENTERPRISE"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: contact_email
+                  type: VARCHAR(150)
+              - column:
+                  name: contact_phone
+                  type: VARCHAR(30)
+              - column:
+                  name: is_active
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_by
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: BIGINT
+              - column:
+                  name: version
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - createIndex:
+            indexName: idx_organizations_code
+            schemaName: platform_master
+            tableName: organizations
+            columns:
+              - column:
+                  name: code
+        - sql:
+            sql: SELECT platform_master.apply_updated_at_trigger('platform_master', 'organizations');
+      rollback:
+        - dropTable:
+            schemaName: platform_master
+            tableName: organizations
+
+  - changeSet:
+      id: "202501010049-organizations-seed"
+      author: "mana-community-dev"
+      context: "default"
+      comment: "Seed default organization"
+      logicalFilePath: "db/changelog/platform/master-data/202501010049-organizations-seed.yaml"
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              INSERT INTO platform_master.organizations (id, name, code, tier, is_active) VALUES
+              (1, 'Mana Global Default Organization', 'DEFAULT_ORG', 'PLATFORM', true)
+              ON CONFLICT (code) DO NOTHING;
+      rollback:
+        - sql:
+            sql: "DELETE FROM platform_master.organizations WHERE code = 'DEFAULT_ORG';"

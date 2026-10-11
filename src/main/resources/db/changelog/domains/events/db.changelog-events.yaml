@@ -24,9 +24,6 @@ databaseChangeLog:
       file: db/changelog/domains/events/tables/202504010016-event-results.yaml
       relativeToChangelogFile: false
   - include:
-      file: db/changelog/domains/events/tables/202504010020-event-pooja-user-registrations.yaml
-      relativeToChangelogFile: false
-  - include:
       file: db/changelog/domains/events/indexes/202504010030-events-indexes.yaml
       relativeToChangelogFile: false
   - include:
