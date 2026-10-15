@@ -15,5 +15,7 @@
     <include file="db/changelog/v1.0.0/07_inventory_assets_and_expenses.xml" relativeToChangelogFile="false"/>
     <include file="db/changelog/v1.0.0/08_warehouse_and_stock_operations.xml" relativeToChangelogFile="false"/>
     <include file="db/changelog/v1.0.0/09_menu_permissions.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/v1.0.0/10_sports_event_auction.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/v1.0.0/11_authoritative_stock_ledger.xml" relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

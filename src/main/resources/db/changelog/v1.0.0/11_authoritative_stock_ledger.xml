@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!-- ════════════════════════════════════════════════════
+         11 — Authoritative Stock Ledger & Non-Negative Constraints
+         ════════════════════════════════════════════════════ -->
+
+    <!-- Stock Ledger Entry (Immutable Audit Trail of all Movements) -->
+    <changeSet author="community-dev" id="v1.0.0-11-01">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="inventory_stock_ledger_entry"/></not>
+        </preConditions>
+        <createTable tableName="inventory_stock_ledger_entry">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="inventory_stock_ledger_entry_pkey"/>
+            </column>
+            <column name="community_id" type="BIGINT">
+                <constraints foreignKeyName="fk_stock_ledger_community" referencedTableName="community" referencedColumnNames="id"/>
+            </column>
+            <column name="product_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_stock_ledger_product" referencedTableName="inventory_product" referencedColumnNames="id"/>
+            </column>
+            <column name="location_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_stock_ledger_loc" referencedTableName="inventory_location" referencedColumnNames="id"/>
+            </column>
+            <column name="lot_id" type="BIGINT">
+                <constraints foreignKeyName="fk_stock_ledger_lot" referencedTableName="inventory_lot" referencedColumnNames="id"/>
+            </column>
+            <column name="movement_type" type="VARCHAR(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reference_type" type="VARCHAR(40)"/>
+            <column name="reference_id" type="VARCHAR(100)"/>
+            <column name="quantity_change" type="DECIMAL(12,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="resulting_balance" type="DECIMAL(12,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="unit_cost" type="DECIMAL(12,2)" defaultValueNumeric="0"/>
+            <column name="total_value" type="DECIMAL(12,2)" defaultValueNumeric="0"/>
+            <column name="notes" type="VARCHAR(500)"/>
+            <column name="created_by" type="BIGINT">
+                <constraints foreignKeyName="fk_stock_ledger_user" referencedTableName="app_user" referencedColumnNames="id"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
