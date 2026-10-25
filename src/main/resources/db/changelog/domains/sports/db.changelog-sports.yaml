@@ -28,6 +28,8 @@ databaseChangeLog:
   - include:
       file: db/changelog/domains/sports/tables/202503010022-auction-bids.yaml
   - include:
+      file: db/changelog/domains/sports/tables/202503010023-sports-trainers.yaml
+  - include:
       file: db/changelog/domains/sports/indexes/202503010030-sports-indexes.yaml
   - include:
       file: db/changelog/domains/sports/views/202503010040-sports-views.yaml
